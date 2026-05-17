@@ -7,11 +7,6 @@
    Last Updated: 2026-05-17
    ========================================================================== */
 
-/* overflow-x: clip on html only -- hidden breaks position: sticky */
-html {
-  overflow-x: clip;
-}
-
 @media (max-width: 767px) {
 
 /* ==========================================================================
