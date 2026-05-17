@@ -507,3 +507,243 @@ if (revealElements.length && typeof gsap !== 'undefined') {
     });
   });
 }
+
+/* ============================================================
+   MOBILE ADDITIONS -- Grant Leisure "Visible Dominance" v2
+   Scope: touch / mobile-only behaviour. Appended below the
+   existing desktop logic. Nothing above this line is modified.
+   Last Updated: 2026-05-17
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   JS FIX 1 -- Reusable swipe binding
+   Touchstart/touchend delta with 50px threshold. Passive
+   listeners -- no scroll-locking, never blocks the timeline.
+   Wired to every mobile carousel below.
+   ------------------------------------------------------------ */
+function addSwipeSupport(container, onSwipeLeft, onSwipeRight) {
+  if (!container) return;
+  let startX = 0;
+  const threshold = 50;
+
+  container.addEventListener('touchstart', function (e) {
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+
+  container.addEventListener('touchend', function (e) {
+    const delta = startX - e.changedTouches[0].clientX;
+    if (Math.abs(delta) < threshold) return;
+    if (delta > 0) {
+      onSwipeLeft();
+    } else {
+      onSwipeRight();
+    }
+  }, { passive: true });
+}
+
+
+/* ------------------------------------------------------------
+   JS FIX 2 -- Swipe on team + testimonials carousels
+   Existing carousel logic untouched. Swipe simply dispatches
+   click events on the existing prev/next buttons so behaviour
+   stays identical to tapping the arrows -- modulo wrap, focus
+   states, the lot.
+   ------------------------------------------------------------ */
+(function wireCarouselSwipe() {
+  const teamCarousel = document.getElementById('team-carousel-track');
+  const teamPrevBtn  = document.getElementById('team-prev');
+  const teamNextBtn  = document.getElementById('team-next');
+
+  if (teamCarousel && teamPrevBtn && teamNextBtn) {
+    addSwipeSupport(
+      teamCarousel,
+      function () { teamNextBtn.click(); },
+      function () { teamPrevBtn.click(); }
+    );
+  }
+
+  const testTrack    = document.getElementById('testimonials-track');
+  const testPrevBtn  = document.getElementById('test-prev');
+  const testNextBtn  = document.getElementById('test-next');
+
+  if (testTrack && testPrevBtn && testNextBtn) {
+    addSwipeSupport(
+      testTrack,
+      function () { testNextBtn.click(); },
+      function () { testPrevBtn.click(); }
+    );
+  }
+}());
+
+
+/* ------------------------------------------------------------
+   JS FIX 3 -- Bento services carousel (mobile only)
+   Six .bento__card elements become a single-card stack on
+   mobile (CSS in mobile.css does the layering). This block
+   injects the prev/next + dot controls, tracks the index with
+   modulo wrap, and wires swipe via the helper above.
+
+   Guarded by viewport width so the carousel only initialises
+   when mobile.css is active. Read More buttons are untouched --
+   they delegate to the existing service modal handler upstream.
+   ------------------------------------------------------------ */
+(function initBentoCarousel() {
+  const MOBILE_MAX = 767;
+  const bento = document.querySelector('.bento');
+  if (!bento) return;
+
+  const cards = bento.querySelectorAll('.bento__card');
+  if (cards.length < 2) return;
+
+  let controls = null;
+  let prevBtn  = null;
+  let nextBtn  = null;
+  let dots     = [];
+  let index    = 0;
+  let mounted  = false;
+
+  function setActive(i) {
+    cards.forEach(function (card, idx) {
+      card.classList.toggle('is-active', idx === i);
+    });
+    dots.forEach(function (dot, idx) {
+      dot.classList.toggle('is-active', idx === i);
+    });
+    index = i;
+  }
+
+  function buildControls() {
+    controls = document.createElement('div');
+    controls.className = 'bento-controls';
+
+    prevBtn = document.createElement('button');
+    prevBtn.className = 'bento-arrow bento-arrow--prev';
+    prevBtn.setAttribute('aria-label', 'Previous service');
+    prevBtn.innerHTML = '&#8592;';
+
+    const dotsWrap = document.createElement('div');
+    dotsWrap.className = 'bento-dots';
+
+    cards.forEach(function (_, i) {
+      const dot = document.createElement('button');
+      dot.className = 'bento-dot';
+      dot.setAttribute('aria-label', 'Go to service ' + (i + 1));
+      dot.addEventListener('click', function () {
+        setActive(i);
+      });
+      dotsWrap.appendChild(dot);
+      dots.push(dot);
+    });
+
+    nextBtn = document.createElement('button');
+    nextBtn.className = 'bento-arrow bento-arrow--next';
+    nextBtn.setAttribute('aria-label', 'Next service');
+    nextBtn.innerHTML = '&#8594;';
+
+    controls.appendChild(prevBtn);
+    controls.appendChild(dotsWrap);
+    controls.appendChild(nextBtn);
+    bento.parentElement.appendChild(controls);
+
+    prevBtn.addEventListener('click', function () {
+      /* Modulo wrap: from card 0 we land on the last card */
+      setActive((index - 1 + cards.length) % cards.length);
+    });
+
+    nextBtn.addEventListener('click', function () {
+      setActive((index + 1) % cards.length);
+    });
+
+    addSwipeSupport(
+      bento,
+      function () { nextBtn.click(); },
+      function () { prevBtn.click(); }
+    );
+  }
+
+  function mount() {
+    if (mounted) return;
+    buildControls();
+    setActive(0);
+    mounted = true;
+  }
+
+  function unmount() {
+    if (!mounted) return;
+    cards.forEach(function (card) { card.classList.remove('is-active'); });
+    if (controls && controls.parentElement) {
+      controls.parentElement.removeChild(controls);
+    }
+    controls = null;
+    prevBtn  = null;
+    nextBtn  = null;
+    dots     = [];
+    index    = 0;
+    mounted  = false;
+  }
+
+  function syncToViewport() {
+    if (window.innerWidth <= MOBILE_MAX) {
+      mount();
+    } else {
+      unmount();
+    }
+  }
+
+  syncToViewport();
+  window.addEventListener('resize', syncToViewport);
+}());
+
+
+/* ------------------------------------------------------------
+   JS FIX 4 -- Reveal animation: matchMedia split
+   The existing .reveal-content ScrollTrigger block (above) was
+   opacity + y rise -- no clip-path was ever in this codebase,
+   so there is no clip-path to disable. We still split desktop
+   and mobile via gsap.matchMedia for parity with the brief.
+
+   On mobile we kill the desktop triggers attached to
+   .reveal-content elements and re-bind a lighter 0.6s fade --
+   opacity only, no transform, no scrub. This also covers the
+   bento cards on viewport rotation: mobile.css hides them by
+   default, so we make sure they're not stuck at opacity 0
+   waiting on a trigger that already fired off-screen.
+   ------------------------------------------------------------ */
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+  const mm = gsap.matchMedia();
+
+  mm.add('(max-width: 767px)', function () {
+    const els = document.querySelectorAll('.reveal-content');
+    if (!els.length) return;
+
+    /* Kill any ScrollTriggers the desktop block bound to these
+       elements -- avoids two competing tweens on resize. */
+    ScrollTrigger.getAll().forEach(function (st) {
+      if (st.trigger && st.trigger.classList && st.trigger.classList.contains('reveal-content')) {
+        st.kill();
+      }
+    });
+
+    els.forEach(function (el) {
+      gsap.set(el, { y: 0 });
+      gsap.fromTo(
+        el,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 90%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+    });
+
+    return function cleanup() {
+      /* matchMedia auto-reverts on breakpoint exit -- nothing else needed */
+    };
+  });
+}

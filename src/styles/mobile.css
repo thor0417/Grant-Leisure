@@ -1,0 +1,277 @@
+/* ==========================================================================
+   MOBILE.CSS -- Grant Leisure "Visible Dominance" v2
+   Scope: Mobile overrides for index.html and projects.html
+   Breakpoint: max-width 767px -- enforced via media attribute on link tag
+   Target: 390px primary, 360px floor
+   No @media queries inside this file
+   Last Updated: 2026-05-17
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   FIX 1 -- Nav overlay above cinematic content (projects page)
+   Actual mobile-nav class is .nav-links (not .nav-menu/.nav-overlay/.mobile-nav).
+   On projects.html, .cinematic-content + .cinematic-image-wrap::after share
+   --z-overlay with the nav. Promote .nav-links to --z-modal so the drop-down
+   panel always tops the cinematic stack. Hamburger button gets the same lift
+   so it stays clickable when the panel is closed.
+   -------------------------------------------------------------------------- */
+
+.site-nav,
+.nav-toggle,
+.nav-links {
+  z-index: var(--z-modal);
+}
+
+
+/* --------------------------------------------------------------------------
+   FIX 2 -- About section: tourist stacks beneath text, framed intentionally
+   .about-inner is already flex-column on mobile via base CSS. Constrain the
+   figure width so it reads as a deliberate portrait rather than a full-bleed
+   panel. object-fit contain preserves the illustration's transparent margins.
+   -------------------------------------------------------------------------- */
+
+.about-figure {
+  max-width: 85%;
+  margin: 2rem auto 0;
+}
+
+.about-figure img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+
+/* --------------------------------------------------------------------------
+   FIX 3 -- Proof scale line: vertical stack, pipe dividers removed
+   Dividers are real <span class="proof-scale-divider"> elements, not ::before
+   pseudos. Hide the spans directly. Stack items by overriding the base flex.
+   -------------------------------------------------------------------------- */
+
+.proof-scale {
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.proof-scale-divider {
+  display: none;
+}
+
+
+/* --------------------------------------------------------------------------
+   FIX 4 -- Marquee: compact scale and spacing
+   Actual classes use BEM: .marquee__track and .marquee__item (not
+   .marquee-track). Reduce logo size + gap so the strip reads as a deliberate
+   trust band, not a wall of brand chrome on a narrow viewport.
+   -------------------------------------------------------------------------- */
+
+.marquee__track {
+  gap: 1.5rem;
+}
+
+.marquee__item img {
+  transform: scale(0.55);
+}
+
+
+/* --------------------------------------------------------------------------
+   FIX 5 -- Services bento as single-card carousel
+   Actual class is .bento__card (BEM, not .bento-card). Container becomes a
+   positioned stage; cards layer absolutely and only the .is-active one is
+   visible + interactive. Controls are injected by JS below the stage.
+   .bento__card--accent left border is suppressed to avoid layout shift
+   between cards. The .reveal-content opacity-from-zero is also overridden
+   here -- on mobile carousels the cards must render visible immediately.
+   -------------------------------------------------------------------------- */
+
+.bento {
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+}
+
+.bento__card {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  border-left: none;
+  height: auto;
+}
+
+.bento__card.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+}
+
+/* Neutralise the desktop ScrollTrigger fade -- carousel needs cards visible */
+.bento__card.reveal-content {
+  opacity: 0;
+  transform: none;
+}
+
+.bento__card.reveal-content.is-active {
+  opacity: 1;
+}
+
+/* Controls injected by JS -- structured to mirror the team carousel */
+.bento-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.bento-arrow {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--gl-green-vivid);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gl-green-vivid);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bento-dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bento-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gl-white);
+  opacity: 0.3;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.bento-dot.is-active {
+  opacity: 1;
+}
+
+
+/* --------------------------------------------------------------------------
+   FIX 6 -- Team carousel: tighter section padding, taller portrait crop
+   Actual section id is #leadership. Photos crop to top to keep faces in
+   frame at the increased height.
+   -------------------------------------------------------------------------- */
+
+#leadership {
+  padding-block: 3rem;
+}
+
+.team-card__img-wrap img {
+  height: 280px;
+  object-fit: cover;
+  object-position: top;
+}
+
+
+/* --------------------------------------------------------------------------
+   FIX 7 -- Projects filter pills: single horizontal row, no scrollbar
+   Actual wrapper class is .category-nav, item class is .category-pill (not
+   .projects-filter / .filter-pills / .filter-pill).
+   -------------------------------------------------------------------------- */
+
+.category-nav {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+
+.category-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.category-pill {
+  flex-shrink: 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   FIX 8 -- Projects editorial rows: stack image over text, full width
+   .project-row is CSS Grid (not flex). Override to single column and
+   neutralise the .is-reversed order rules so reversed rows render identical
+   to standard rows on mobile. Image block has a hard aspect-ratio: 4/3 in
+   the desktop CSS -- explicitly unset it before fixing height.
+   -------------------------------------------------------------------------- */
+
+.project-row,
+.project-row.is-reversed {
+  grid-template-columns: 1fr;
+}
+
+.project-row.is-reversed .project-image-block,
+.project-row.is-reversed .project-text-block {
+  order: initial;
+}
+
+.project-row.is-reversed .project-image-block {
+  border-left: none;
+  border-right: 1px solid rgba(50, 62, 72, 0.12);
+}
+
+.project-image-block {
+  width: 100%;
+  height: 260px;
+  aspect-ratio: auto;
+  border-right: none;
+  border-bottom: 1px solid rgba(50, 62, 72, 0.12);
+}
+
+.project-image-block img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.project-text-block {
+  width: 100%;
+  padding: 2rem 1.25rem;
+}
+
+
+/* --------------------------------------------------------------------------
+   FIX 9 -- Cinematic rows: text scaled down for mobile viewport
+   -------------------------------------------------------------------------- */
+
+.cinematic-title {
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+}
+
+.cinematic-teaser {
+  font-size: 1rem;
+}
+
+
+/* --------------------------------------------------------------------------
+   FIX 10 -- Brief panels: comfortable padding, 48px touch on close
+   -------------------------------------------------------------------------- */
+
+.project-panel-inner,
+.cinematic-panel-inner {
+  padding: 1.5rem 1.25rem;
+}
+
+.project-close,
+.cinematic-close {
+  min-height: 48px;
+  min-width: 48px;
+}
