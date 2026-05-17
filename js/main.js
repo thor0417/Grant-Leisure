@@ -602,6 +602,29 @@ function addSwipeSupport(container, onSwipeLeft, onSwipeRight) {
   let index    = 0;
   let mounted  = false;
 
+  /* Kill any GSAP ScrollTriggers attached to bento cards and strip the
+     inline opacity/transform GSAP slammed onto them. Without this, all six
+     cards render simultaneously on mobile because GSAP's inline opacity:1
+     beats our CSS. Runs every time the carousel mounts. */
+  function purgeGsapStateFromCards() {
+    if (typeof ScrollTrigger !== 'undefined') {
+      ScrollTrigger.getAll().forEach(function (st) {
+        if (st.trigger && st.trigger.classList && st.trigger.classList.contains('bento__card')) {
+          st.kill();
+        }
+      });
+    }
+    cards.forEach(function (card) {
+      if (typeof gsap !== 'undefined') {
+        gsap.killTweensOf(card);
+      }
+      card.style.removeProperty('opacity');
+      card.style.removeProperty('transform');
+      card.style.removeProperty('translate');
+      card.style.removeProperty('y');
+    });
+  }
+
   function setActive(i) {
     cards.forEach(function (card, idx) {
       card.classList.toggle('is-active', idx === i);
@@ -663,9 +686,15 @@ function addSwipeSupport(container, onSwipeLeft, onSwipeRight) {
 
   function mount() {
     if (mounted) return;
+    purgeGsapStateFromCards();
     buildControls();
     setActive(0);
     mounted = true;
+    /* GSAP may fire its reveal ScrollTrigger on the very next frame as the
+       user scrolls toward the section. Re-purge a moment later to clean any
+       inline opacity it slammed on after our initial purge. */
+    setTimeout(purgeGsapStateFromCards, 100);
+    setTimeout(purgeGsapStateFromCards, 500);
   }
 
   function unmount() {
