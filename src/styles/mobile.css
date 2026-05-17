@@ -18,14 +18,19 @@
 
 
 /* --------------------------------------------------------------------------
-   FIX 1 -- Nav stack above cinematic content + suppress shadow bar
-   AUDITED: --z-modal was uncertain (tokens.css not in this scope) and the
-   live site showed cinematic content still winning. Hardcoded 9999 removes
-   the dependency. Comment explains the override.
+   FIX 1 -- Nav: locked solid navy, anchor logo from top (not centered),
+   white separator above projects pills
 
-   Separately, .site-nav.is-scrolled carries a box-shadow that on mobile
-   reads as a horizontal line cutting through the GLI logo. Suppress it
-   here so the logo lockup stays visually clean.
+   AUDIT REV 5: align-items:center on .nav-inner places the 41px logo at
+   the geometric center of the nav. On iOS Brave the URL bar overlays the
+   top portion of the fixed nav during scroll, which clips the visually-
+   centered logo at top. Switch to align-items:flex-start with explicit
+   padding-top so the logo sits at a known offset that survives browser
+   chrome overlap.
+
+   Also: backdrop-filter blur renders inconsistently on Brave iOS and was
+   causing the nav to "disappear" on scroll. Force opaque navy on both
+   states with no transition.
    -------------------------------------------------------------------------- */
 
 .site-nav,
@@ -36,30 +41,40 @@
 
 .site-nav,
 .site-nav.is-scrolled {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
   background: var(--gl-navy) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
   border-bottom: none !important;
   transition: none !important;
-  /* Lock nav fixed and visible -- no opacity/transform tricks can hide it.
-     Prevents the "nav disappears on scroll" symptom on projects page. */
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
   opacity: 1 !important;
   visibility: visible !important;
   transform: none !important;
   padding-top: env(safe-area-inset-top, 0) !important;
 }
 
-/* Nav-inner: bumped height gives the logo top clearance even if the
-   browser URL bar overlays the very top edge of the fixed nav during
-   scroll transitions on iOS Brave/Safari. */
+/* Anchor the logo and hamburger from the top of the nav with explicit
+   padding rather than centering. Survives iOS browser chrome overlap. */
 .nav-inner {
   height: 88px !important;
-  padding-top: 8px !important;
+  align-items: flex-start !important;
+  padding-top: 22px !important;
+}
+
+.nav-logo,
+.nav-toggle {
+  align-self: flex-start !important;
+}
+
+/* Projects-page pill bar -- opaque navy, sits below the taller mobile nav.
+   White separator strip between the two via box-shadow on the bottom of
+   the nav AND a transparent gap created by margin-top on the pill bar. */
+.site-nav {
+  box-shadow: 0 4px 0 var(--gl-white) !important;
 }
 
 .projects-header,
@@ -67,12 +82,9 @@
   background: var(--gl-navy) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-}
-
-/* Projects-header sits below the taller mobile nav. Bump its sticky top
-   so it doesn't hide behind the nav. */
-.projects-header {
-  top: 88px !important;
+  top: 92px !important;
+  z-index: 200 !important;
+  margin-top: 0 !important;
 }
 
 
@@ -84,14 +96,14 @@
    -------------------------------------------------------------------------- */
 
 .about-figure {
-  max-width: 85% !important;
-  margin: 2rem auto 0 !important;
+  max-width: 85%;
+  margin: 2rem auto 0;
 }
 
 .about-figure img {
-  width: 100% !important;
-  height: auto !important;
-  object-fit: contain !important;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 
@@ -102,48 +114,45 @@
    -------------------------------------------------------------------------- */
 
 .proof-scale {
-  flex-direction: column !important;
-  gap: 0.5rem !important;
-  text-align: center !important;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: center;
 }
 
 .proof-scale-divider {
-  display: none !important;
+  display: none;
 }
 
 
 /* --------------------------------------------------------------------------
-   FIX 4 -- Marquee: compact scale and spacing
-   Actual classes use BEM: .marquee__track and .marquee__item (not
-   .marquee-track). Reduce logo size + gap so the strip reads as a deliberate
-   trust band, not a wall of brand chrome on a narrow viewport.
+   FIX 4 -- Marquee: uniform height, natural width, consistent gap
+   AUDIT REV 5: Constraining by BOTH max-height AND max-width on logos
+   with wildly different aspect ratios produced inconsistent sizes (tall
+   narrow logos appeared shorter than wide squat ones). Constrain by
+   HEIGHT ONLY -- every logo at exactly 28px tall, width adjusts naturally.
+   Per-logo [alt="..."] transform rules in components.css are killed with
+   !important on a high-specificity selector.
    -------------------------------------------------------------------------- */
 
-/* Mobile marquee: each item sizes to its content, consistent visual height
-   via max-height on the img itself. Removes the "some logos look tiny, some
-   look cramped" effect caused by forcing a 110px box around varied logo
-   aspect ratios. */
 .marquee__track {
-  gap: 2rem !important;
+  gap: 2.5rem !important;
   align-items: center !important;
 }
 
 .marquee__item {
   width: auto !important;
-  height: auto !important;
+  height: 28px !important;
   flex-shrink: 0 !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
 }
 
 .marquee__item img,
 .marquee__item img[alt] {
   transform: none !important;
-  max-height: 32px !important;
+  height: 28px !important;
   width: auto !important;
-  height: auto !important;
-  max-width: 110px !important;
+  max-width: none !important;
   object-fit: contain !important;
 }
 
@@ -159,26 +168,35 @@
    -------------------------------------------------------------------------- */
 
 .bento {
-  position: relative !important;
-  overflow: hidden !important;
-  min-height: 320px !important;
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
 }
 
 .bento__card {
-  position: absolute !important;
-  inset: 0 !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 0.3s ease;
-  border-left: none !important;
-  height: auto !important;
-  transform: none !important;
+  border-left: none;
+  height: auto;
 }
 
 .bento__card.is-active {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  position: relative !important;
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+}
+
+/* Neutralise the desktop ScrollTrigger fade -- carousel needs cards visible */
+.bento__card.reveal-content {
+  opacity: 0;
+  transform: none;
+}
+
+.bento__card.reveal-content.is-active {
+  opacity: 1;
 }
 
 /* Controls injected by JS -- structured to mirror the team carousel */
@@ -227,20 +245,48 @@
 
 
 /* --------------------------------------------------------------------------
-   FIX 6 -- Team carousel: tighter section padding, taller portrait crop
-   Actual section id is #leadership. Photos crop to top to keep faces in
-   frame at the increased height.
+   FIX 6 -- Team photos: per-member object-position
+   AUDIT REV 5: Each headshot has the face at a different position in its
+   source crop, so a single object-position value cannot fix all of them.
+   Target each img by its src attribute and tune the crop individually.
+   Andrew Coates: chin clipped -- shift photo UP (lower object-position Y)
+   Keith Robertson: top of hair clipped -- shift photo DOWN (higher Y)
+   Andy Grant: top of hair clipped -- shift photo DOWN
+   Robert Liljenwall: face well-centered -- center crop is fine
+   Others: keep at top-leaning default
    -------------------------------------------------------------------------- */
 
 #leadership {
   padding-block: 3rem !important;
 }
 
-.team-card__img-wrap img,
-.team-card--keith .team-card__img-wrap img {
+.team-card__img-wrap img {
   height: 100% !important;
   object-fit: cover !important;
+  object-position: center 25% !important;
+}
+
+/* Per-member tuning. Override the Keith rule that lives in components.css
+   so this mobile crop wins. */
+.team-card__img-wrap img[src*="andrew-coates"] {
+  object-position: center 75% !important;
+}
+
+.team-card__img-wrap img[src*="keith-robertson"],
+.team-card--keith .team-card__img-wrap img {
+  object-position: center 35% !important;
+}
+
+.team-card__img-wrap img[src*="andy-grant"] {
+  object-position: center 35% !important;
+}
+
+.team-card__img-wrap img[src*="robert-liljenwall"] {
   object-position: center center !important;
+}
+
+.team-card__img-wrap img[src*="philip-kwong"] {
+  object-position: center 30% !important;
 }
 
 
@@ -250,13 +296,20 @@
    .projects-filter / .filter-pills / .filter-pill).
    -------------------------------------------------------------------------- */
 
+/* --------------------------------------------------------------------------
+   FIX 7 -- Pills: all 5 visible at once, tight padding, no scroll
+   AUDIT REV 5: Horizontal scroll was bad UX -- no affordance for "more
+   pills offscreen." Shrink padding + font to fit all 5 in viewport width.
+   Wrap allowed as a fallback for narrowest devices.
+   -------------------------------------------------------------------------- */
+
 .category-nav {
+  display: flex !important;
   flex-wrap: nowrap !important;
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  gap: 0.75rem !important;
-  padding-bottom: 0.5rem !important;
+  justify-content: center !important;
+  overflow-x: visible !important;
+  gap: 0.4rem !important;
+  padding: 0 0.5rem !important;
 }
 
 .category-nav::-webkit-scrollbar {
@@ -264,7 +317,17 @@
 }
 
 .category-pill {
-  flex-shrink: 0 !important;
+  flex-shrink: 1 !important;
+  flex-grow: 0 !important;
+  padding: 0 0.6rem !important;
+  font-size: 0.6rem !important;
+  height: 36px !important;
+  letter-spacing: 0.05em !important;
+  white-space: nowrap !important;
+}
+
+.projects-header-inner {
+  padding: 1rem 0.5rem !important;
 }
 
 
@@ -299,7 +362,7 @@
 
 .project-image-block {
   width: 100%;
-  height: 300px !important;
+  height: 260px !important;
   aspect-ratio: auto !important;
   border-right: none !important;
   border-bottom: 1px solid rgba(50, 62, 72, 0.12);
@@ -313,64 +376,21 @@
 }
 
 .project-text-block {
-  width: 100% !important;
-  padding: 2rem 1.25rem !important;
+  width: 100%;
+  padding: 2rem 1.25rem;
 }
 
 
 /* --------------------------------------------------------------------------
-   FIX 9 -- Cinematic rows: drop 16:9 ratio, give content room to breathe
-   AUDIT REV 4: .project-row-cinematic has aspect-ratio:16/9 in projects.css.
-   On a 390px viewport that resolves to 219px tall -- nowhere near enough
-   space for the location pill + title + teaser + button + padding stack,
-   which needs ~380px. Content overflowed upward and got covered by the
-   sticky pill header on scroll. Replace the ratio with min-height, clip
-   overflow, scale text down so it fits cleanly.
-
-   Also lift .projects-header above cinematic content so even if a stray
-   layout pixel overlaps, the pills win with their opaque navy background.
+   FIX 9 -- Cinematic rows: text scaled down for mobile viewport
    -------------------------------------------------------------------------- */
 
-/* Lock the body's horizontal axis so the category-nav internal scroll
-   doesn't drag the whole page sideways on iOS Brave. overscroll-behavior
-   also keeps the pill bar's overscroll from triggering page navigation. */
-html,
-body {
-  overflow-x: hidden !important;
-  overscroll-behavior-x: contain !important;
-}
-
-.category-nav {
-  overscroll-behavior-x: contain !important;
-}
-
-.project-row-cinematic {
-  aspect-ratio: auto !important;
-  min-height: 360px !important;
-  overflow: hidden !important;
-}
-
-.cinematic-content {
-  padding: 1.5rem 1.25rem !important;
-}
-
 .cinematic-title {
-  font-size: clamp(1.6rem, 5vw, 2.2rem) !important;
-  margin-bottom: 0.75rem !important;
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
 }
 
 .cinematic-teaser {
-  font-size: 1rem !important;
-  margin-bottom: 1rem !important;
-}
-
-.cinematic-location {
-  margin-bottom: 0.75rem !important;
-}
-
-/* Pill header must outrank cinematic content so it never half-renders */
-.projects-header {
-  z-index: 200 !important;
+  font-size: 1rem;
 }
 
 
@@ -380,13 +400,13 @@ body {
 
 .project-panel-inner,
 .cinematic-panel-inner {
-  padding: 1.5rem 1.25rem !important;
+  padding: 1.5rem 1.25rem;
 }
 
 .project-close,
 .cinematic-close {
-  min-height: 48px !important;
-  min-width: 48px !important;
+  min-height: 48px;
+  min-width: 48px;
 }
 
 } /* end @media (max-width: 767px) */

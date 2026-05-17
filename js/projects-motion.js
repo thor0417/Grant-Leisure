@@ -34,10 +34,8 @@
 
   /* ============================================================
      1. LENIS -- desktop only
-     Mobile browsers handle native scroll better than Lenis can fake;
-     running Lenis + GSAP ScrollTrigger together on a phone causes the
-     choppy/glitchy behaviour reported in mobile audit. Gate behind a
-     viewport check so phones get native scroll, desktop gets smooth.
+     Lenis + GSAP ScrollTrigger fighting on mobile causes choppy scroll.
+     Native scroll is smoother on touch devices.
      ============================================================ */
 
   let lenis = null;
@@ -60,9 +58,7 @@
 
     ScrollTrigger.refresh();
 
-  } else if (isMobileViewport) {
-    /* Mobile: native scroll. No Lenis. */
-  } else {
+  } else if (!isMobileViewport) {
     console.warn('projects-motion.js: Lenis not found. Falling back to native scroll.');
   }
 
@@ -179,8 +175,8 @@
     });
 
     /* Cinematic Ken Burns + text reveal
-       Skip the scrub-based scale on mobile -- it's the primary cause of
-       choppy/glitchy scroll on phones. Text reveal still runs. */
+       Skip scrub-based scale on mobile -- primary jank source. Text
+       reveal still runs. */
     const skipParallax = window.innerWidth <= 767;
 
     gsap.utils.toArray('.project-row-cinematic').forEach(function (row) {
