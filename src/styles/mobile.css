@@ -42,6 +42,24 @@
   box-shadow: none !important;
   border-bottom: none !important;
   transition: none !important;
+  /* Lock nav fixed and visible -- no opacity/transform tricks can hide it.
+     Prevents the "nav disappears on scroll" symptom on projects page. */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  padding-top: env(safe-area-inset-top, 0) !important;
+}
+
+/* Nav-inner: bumped height gives the logo top clearance even if the
+   browser URL bar overlays the very top edge of the fixed nav during
+   scroll transitions on iOS Brave/Safari. */
+.nav-inner {
+  height: 88px !important;
+  padding-top: 8px !important;
 }
 
 .projects-header,
@@ -49,6 +67,12 @@
   background: var(--gl-navy) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+
+/* Projects-header sits below the taller mobile nav. Bump its sticky top
+   so it doesn't hide behind the nav. */
+.projects-header {
+  top: 88px !important;
 }
 
 
@@ -95,19 +119,32 @@
    trust band, not a wall of brand chrome on a narrow viewport.
    -------------------------------------------------------------------------- */
 
+/* Mobile marquee: each item sizes to its content, consistent visual height
+   via max-height on the img itself. Removes the "some logos look tiny, some
+   look cramped" effect caused by forcing a 110px box around varied logo
+   aspect ratios. */
 .marquee__track {
-  gap: 1rem !important;
-  padding-inline: 1rem !important;
+  gap: 2rem !important;
+  align-items: center !important;
 }
 
 .marquee__item {
-  width: 110px !important;
-  height: 55px !important;
+  width: auto !important;
+  height: auto !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .marquee__item img,
 .marquee__item img[alt] {
   transform: none !important;
+  max-height: 32px !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 110px !important;
+  object-fit: contain !important;
 }
 
 
@@ -262,7 +299,7 @@
 
 .project-image-block {
   width: 100%;
-  height: 260px !important;
+  height: 300px !important;
   aspect-ratio: auto !important;
   border-right: none !important;
   border-bottom: 1px solid rgba(50, 62, 72, 0.12);
@@ -294,9 +331,22 @@
    layout pixel overlaps, the pills win with their opaque navy background.
    -------------------------------------------------------------------------- */
 
+/* Lock the body's horizontal axis so the category-nav internal scroll
+   doesn't drag the whole page sideways on iOS Brave. overscroll-behavior
+   also keeps the pill bar's overscroll from triggering page navigation. */
+html,
+body {
+  overflow-x: hidden !important;
+  overscroll-behavior-x: contain !important;
+}
+
+.category-nav {
+  overscroll-behavior-x: contain !important;
+}
+
 .project-row-cinematic {
   aspect-ratio: auto !important;
-  min-height: 420px !important;
+  min-height: 360px !important;
   overflow: hidden !important;
 }
 
