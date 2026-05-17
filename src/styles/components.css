@@ -19,7 +19,7 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: var(--z-nav);
+  z-index: var(--z-modal); /* Elevated to --z-modal -- cinematic overlay rows on projects.html sit at --z-overlay and beat --z-nav, hiding the ghost nav */
   /* Transparent over hero video by default */
   background: transparent;
   transition: background var(--duration-default) var(--ease-stellar),
