@@ -1,26 +1,46 @@
 /* ==========================================================================
    MOBILE.CSS -- Grant Leisure "Visible Dominance" v2
    Scope: Mobile overrides for index.html and projects.html
-   Breakpoint: max-width 767px -- enforced via media attribute on link tag
+   Breakpoint: max-width 767px -- ENFORCED INSIDE THIS FILE
    Target: 390px primary, 360px floor
-   No @media queries inside this file
-   Last Updated: 2026-05-17
+
+   AUDIT REVISION 2026-05-17:
+   Original build relied on media="(max-width: 767px)" on the link tag.
+   Live mobile site showed the stylesheet was not applying -- projects
+   rows stayed 2-column, bento cards rendered stacked, nav box-shadow
+   leaked through the logo. Root cause was the link-attribute media
+   gate. Fix: load mobile.css unconditionally and wrap every rule in a
+   single @media block here. Source order then guarantees overrides
+   win without specificity battles.
    ========================================================================== */
+
+@media (max-width: 767px) {
 
 
 /* --------------------------------------------------------------------------
-   FIX 1 -- Nav overlay above cinematic content (projects page)
-   Actual mobile-nav class is .nav-links (not .nav-menu/.nav-overlay/.mobile-nav).
-   On projects.html, .cinematic-content + .cinematic-image-wrap::after share
-   --z-overlay with the nav. Promote .nav-links to --z-modal so the drop-down
-   panel always tops the cinematic stack. Hamburger button gets the same lift
-   so it stays clickable when the panel is closed.
+   FIX 1 -- Nav stack above cinematic content + suppress shadow bar
+   AUDITED: --z-modal was uncertain (tokens.css not in this scope) and the
+   live site showed cinematic content still winning. Hardcoded 9999 removes
+   the dependency. Comment explains the override.
+
+   Separately, .site-nav.is-scrolled carries a box-shadow that on mobile
+   reads as a horizontal line cutting through the GLI logo. Suppress it
+   here so the logo lockup stays visually clean.
    -------------------------------------------------------------------------- */
 
 .site-nav,
 .nav-toggle,
 .nav-links {
-  z-index: var(--z-modal);
+  /* 9999 -- explicit override of any cinematic-layer z-index (projects page).
+     Hardcoded because --z-modal could not be verified to outrank cinematic
+     content; this is the deliberate exception to the no-magic-numbers rule. */
+  z-index: 9999;
+}
+
+.site-nav,
+.site-nav.is-scrolled {
+  box-shadow: none;
+  border-bottom: none;
 }
 
 
@@ -176,7 +196,9 @@
 .team-card__img-wrap img {
   height: 280px;
   object-fit: cover;
-  object-position: top;
+  /* center 20% -- preserves the face mid-frame without clipping the top
+     of the head, which object-position: top was doing on every portrait */
+  object-position: center 20%;
 }
 
 
@@ -210,28 +232,34 @@
    neutralise the .is-reversed order rules so reversed rows render identical
    to standard rows on mobile. Image block has a hard aspect-ratio: 4/3 in
    the desktop CSS -- explicitly unset it before fixing height.
+
+   AUDITED: !important applied on the core layout properties as defensive
+   armor. projects.css loads before mobile.css and the desktop two-column
+   rule is gated behind @media (min-width: 768px), but the live site showed
+   rows still rendering 2-up. Forcing the override removes any chance of a
+   cascade or specificity surprise in the wild.
    -------------------------------------------------------------------------- */
 
 .project-row,
 .project-row.is-reversed {
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr !important;
 }
 
 .project-row.is-reversed .project-image-block,
 .project-row.is-reversed .project-text-block {
-  order: initial;
+  order: initial !important;
 }
 
 .project-row.is-reversed .project-image-block {
-  border-left: none;
+  border-left: none !important;
   border-right: 1px solid rgba(50, 62, 72, 0.12);
 }
 
 .project-image-block {
   width: 100%;
-  height: 260px;
-  aspect-ratio: auto;
-  border-right: none;
+  height: 260px !important;
+  aspect-ratio: auto !important;
+  border-right: none !important;
   border-bottom: 1px solid rgba(50, 62, 72, 0.12);
 }
 
@@ -275,3 +303,5 @@
   min-height: 48px;
   min-width: 48px;
 }
+
+} /* end @media (max-width: 767px) */
