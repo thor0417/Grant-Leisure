@@ -1,55 +1,29 @@
 /* ==========================================================================
    MOBILE.CSS -- Grant Leisure "Visible Dominance" v2
    Scope: Mobile overrides for index.html and projects.html
-   Breakpoint: max-width 767px -- ENFORCED INSIDE THIS FILE
+   Breakpoint: max-width 767px enforced via @media inside this file
    Target: 390px primary, 360px floor
-
-   AUDIT REVISION 2026-05-17:
-   Original build relied on media="(max-width: 767px)" on the link tag.
-   Live mobile site showed the stylesheet was not applying -- projects
-   rows stayed 2-column, bento cards rendered stacked, nav box-shadow
-   leaked through the logo. Root cause was the link-attribute media
-   gate. Fix: load mobile.css unconditionally and wrap every rule in a
-   single @media block here. Source order then guarantees overrides
-   win without specificity battles.
+   Load order: after components.css and projects.css
+   Last Updated: 2026-05-17
    ========================================================================== */
+
+/* overflow-x: clip on html only -- hidden breaks position: sticky */
+html {
+  overflow-x: clip;
+}
 
 @media (max-width: 767px) {
 
+/* ==========================================================================
+   NAVIGATION
+   ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   FIX 1 -- Nav: locked solid navy, anchor logo from top (not centered),
-   white separator above projects pills
-
-   AUDIT REV 5: align-items:center on .nav-inner places the 41px logo at
-   the geometric center of the nav. On iOS Brave the URL bar overlays the
-   top portion of the fixed nav during scroll, which clips the visually-
-   centered logo at top. Switch to align-items:flex-start with explicit
-   padding-top so the logo sits at a known offset that survives browser
-   chrome overlap.
-
-   Also: backdrop-filter blur renders inconsistently on Brave iOS and was
-   causing the nav to "disappear" on scroll. Force opaque navy on both
-   states with no transition.
-   -------------------------------------------------------------------------- */
-
-/* overflow-x: hidden on body breaks position: sticky.
-   Set ONLY on html -- stops horizontal scroll without
-   killing sticky pill bar. */
-html {
-  overflow-x: clip !important;
-}
-
-/* Nav -- z-index above everything */
 .site-nav,
 .nav-toggle,
 .nav-links {
   z-index: 9999 !important;
 }
 
-/* Nav -- solid navy, no ghost, no blur, no shadow.
-   safe-area-inset-top pushes content below iOS browser chrome
-   so the logo is never clipped by the URL bar. */
 .site-nav,
 .site-nav.is-scrolled {
   background: var(--gl-navy) !important;
@@ -58,24 +32,26 @@ html {
   box-shadow: none !important;
   border-bottom: none !important;
   transition: none !important;
-  padding-top: env(safe-area-inset-top, 0px) !important;
 }
 
-/* Nav inner -- 60px on mobile, logo centered */
 .nav-inner {
   height: 60px !important;
   align-items: center !important;
   padding-top: 0 !important;
 }
 
-/* Logo -- sized to fit inside 60px nav with breathing room */
 .nav-logo img {
   height: 28px !important;
   width: auto !important;
   display: block !important;
 }
 
-/* Projects pill bar -- sticky, flush below 60px mobile nav */
+
+/* ==========================================================================
+   PROJECTS PILL BAR
+   Sticky below the 60px mobile nav. Solid navy, no blur.
+   ========================================================================== */
+
 .projects-header,
 .projects-header.is-scrolled {
   position: sticky !important;
@@ -88,13 +64,38 @@ html {
   box-shadow: none !important;
 }
 
+.projects-header-inner {
+  padding: 1rem 0.5rem !important;
+}
 
-/* --------------------------------------------------------------------------
-   FIX 2 -- About section: tourist stacks beneath text, framed intentionally
-   .about-inner is already flex-column on mobile via base CSS. Constrain the
-   figure width so it reads as a deliberate portrait rather than a full-bleed
-   panel. object-fit contain preserves the illustration's transparent margins.
-   -------------------------------------------------------------------------- */
+.category-nav {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  overflow-x: hidden !important;
+  gap: 0.4rem !important;
+  padding: 0 0.5rem !important;
+}
+
+.category-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.category-pill {
+  flex-shrink: 1 !important;
+  flex-grow: 0 !important;
+  padding: 0 0.6rem !important;
+  font-size: 0.6rem !important;
+  height: 36px !important;
+  letter-spacing: 0.05em !important;
+  white-space: nowrap !important;
+}
+
+
+/* ==========================================================================
+   ABOUT SECTION
+   Tourist illustration stacks below text, centered and proportional.
+   ========================================================================== */
 
 .about-figure {
   max-width: 85%;
@@ -108,11 +109,10 @@ html {
 }
 
 
-/* --------------------------------------------------------------------------
-   FIX 3 -- Proof scale line: vertical stack, pipe dividers removed
-   Dividers are real <span class="proof-scale-divider"> elements, not ::before
-   pseudos. Hide the spans directly. Stack items by overriding the base flex.
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   PROOF SECTION
+   Scale line stacks vertically. Pipe divider spans hidden.
+   ========================================================================== */
 
 .proof-scale {
   flex-direction: column;
@@ -125,21 +125,11 @@ html {
 }
 
 
-/* --------------------------------------------------------------------------
-   FIX 4 -- Marquee: uniform height, natural width, consistent gap
-   AUDIT REV 5: Constraining by BOTH max-height AND max-width on logos
-   with wildly different aspect ratios produced inconsistent sizes (tall
-   narrow logos appeared shorter than wide squat ones). Constrain by
-   HEIGHT ONLY -- every logo at exactly 28px tall, width adjusts naturally.
-   Per-logo [alt="..."] transform rules in components.css are killed with
-   !important on a high-specificity selector.
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   MARQUEE
+   Gap tightened. Per-logo scale tuning in components.css preserved.
+   ========================================================================== */
 
-/* Marquee -- tighter gap, restore natural sizing.
-   Do NOT set transform: none -- this kills the per-logo optical scale
-   tuning locked in components.css. Height constraint removed -- it was
-   causing logos with different aspect ratios to appear inconsistent sizes.
-   Let each logo render at its natural scale with the gap tightened only. */
 .marquee__track {
   gap: 2rem !important;
   align-items: center !important;
@@ -152,15 +142,11 @@ html {
 }
 
 
-/* --------------------------------------------------------------------------
-   FIX 5 -- Services bento as single-card carousel
-   Actual class is .bento__card (BEM, not .bento-card). Container becomes a
-   positioned stage; cards layer absolutely and only the .is-active one is
-   visible + interactive. Controls are injected by JS below the stage.
-   .bento__card--accent left border is suppressed to avoid layout shift
-   between cards. The .reveal-content opacity-from-zero is also overridden
-   here -- on mobile carousels the cards must render visible immediately.
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   SERVICES BENTO CAROUSEL
+   Single card visible at a time. Controls injected by JS.
+   Carousel and swipe confirmed working -- do not touch.
+   ========================================================================== */
 
 .bento {
   position: relative;
@@ -184,7 +170,6 @@ html {
   position: relative;
 }
 
-/* Neutralise the desktop ScrollTrigger fade -- carousel needs cards visible */
 .bento__card.reveal-content {
   opacity: 0;
   transform: none;
@@ -194,7 +179,6 @@ html {
   opacity: 1;
 }
 
-/* Controls injected by JS -- structured to mirror the team carousel */
 .bento-controls {
   display: flex;
   align-items: center;
@@ -239,17 +223,11 @@ html {
 }
 
 
-/* --------------------------------------------------------------------------
-   FIX 6 -- Team photos: per-member object-position
-   AUDIT REV 5: Each headshot has the face at a different position in its
-   source crop, so a single object-position value cannot fix all of them.
-   Target each img by its src attribute and tune the crop individually.
-   Andrew Coates: chin clipped -- shift photo UP (lower object-position Y)
-   Keith Robertson: top of hair clipped -- shift photo DOWN (higher Y)
-   Andy Grant: top of hair clipped -- shift photo DOWN
-   Robert Liljenwall: face well-centered -- center crop is fine
-   Others: keep at top-leaning default
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   TEAM CAROUSEL
+   Per-member object-position tuning to preserve face framing.
+   Carousel and swipe confirmed working -- do not touch.
+   ========================================================================== */
 
 #leadership {
   padding-block: 3rem !important;
@@ -261,8 +239,6 @@ html {
   object-position: center 25% !important;
 }
 
-/* Per-member tuning. Override the Keith rule that lives in components.css
-   so this mobile crop wins. */
 .team-card__img-wrap img[src*="andrew-coates"] {
   object-position: center 75% !important;
 }
@@ -285,60 +261,11 @@ html {
 }
 
 
-/* --------------------------------------------------------------------------
-   FIX 7 -- Projects filter pills: single horizontal row, no scrollbar
-   Actual wrapper class is .category-nav, item class is .category-pill (not
-   .projects-filter / .filter-pills / .filter-pill).
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   FIX 7 -- Pills: all 5 visible at once, tight padding, no scroll
-   AUDIT REV 5: Horizontal scroll was bad UX -- no affordance for "more
-   pills offscreen." Shrink padding + font to fit all 5 in viewport width.
-   Wrap allowed as a fallback for narrowest devices.
-   -------------------------------------------------------------------------- */
-
-.category-nav {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  justify-content: center !important;
-  overflow-x: hidden !important;
-  gap: 0.4rem !important;
-  padding: 0 0.5rem !important;
-}
-
-.category-nav::-webkit-scrollbar {
-  display: none;
-}
-
-.category-pill {
-  flex-shrink: 1 !important;
-  flex-grow: 0 !important;
-  padding: 0 0.6rem !important;
-  font-size: 0.6rem !important;
-  height: 36px !important;
-  letter-spacing: 0.05em !important;
-  white-space: nowrap !important;
-}
-
-.projects-header-inner {
-  padding: 1rem 0.5rem !important;
-}
-
-
-/* --------------------------------------------------------------------------
-   FIX 8 -- Projects editorial rows: stack image over text, full width
-   .project-row is CSS Grid (not flex). Override to single column and
-   neutralise the .is-reversed order rules so reversed rows render identical
-   to standard rows on mobile. Image block has a hard aspect-ratio: 4/3 in
-   the desktop CSS -- explicitly unset it before fixing height.
-
-   AUDITED: !important applied on the core layout properties as defensive
-   armor. projects.css loads before mobile.css and the desktop two-column
-   rule is gated behind @media (min-width: 768px), but the live site showed
-   rows still rendering 2-up. Forcing the override removes any chance of a
-   cascade or specificity surprise in the wild.
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   PROJECTS -- EDITORIAL ROWS
+   Single column stack. Image top, text below. Reversed rows normalized.
+   aspect-ratio unset so the explicit height takes effect.
+   ========================================================================== */
 
 .project-row,
 .project-row.is-reversed {
@@ -377,12 +304,11 @@ html {
 }
 
 
-/* --------------------------------------------------------------------------
-   FIX 9 -- Cinematic rows: explicit height, image fills, text anchors bottom
-   Desktop aspect-ratio: 16/9 at 390px = ~219px -- too short for content.
-   Must use height (not min-height) because .cinematic-image-wrap and
-   .cinematic-content are position:absolute -- they need a sized parent.
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   PROJECTS -- CINEMATIC ROWS
+   Explicit height so absolute children have a sized parent.
+   Image fills full frame. Content anchors to bottom.
+   ========================================================================== */
 
 .project-row-cinematic {
   aspect-ratio: unset !important;
@@ -432,9 +358,9 @@ html {
 }
 
 
-/* --------------------------------------------------------------------------
-   FIX 10 -- Brief panels: comfortable padding, 48px touch on close
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   PROJECTS -- BRIEF PANELS
+   ========================================================================== */
 
 .project-panel-inner,
 .cinematic-panel-inner {
