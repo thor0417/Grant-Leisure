@@ -9,14 +9,14 @@
   background: var(--gl-navy);
   position: sticky;
   top: 72px; /* Sits flush below the 72px main nav -- not behind it */
-  z-index: var(--z-overlay);
+  z-index: 50; /* Below --z-nav (100) so nav always sits on top of pill bar */
   transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
 /* Force the site nav to solid navy on the projects page.
    No hero video means the ghost-transparent default renders as white.
-   z-index explicitly set above --z-overlay -- cinematic-content sits at
-   --z-overlay and would otherwise paint over the fixed nav. */
+   z-index: 9999 beats cinematic-content (--z-overlay: 10) and the
+   pill bar (50). Using 9999 instead of --z-modal (1000) as belt-and-braces. */
 .site-nav {
   background: var(--gl-navy) !important;
   z-index: 9999 !important;
