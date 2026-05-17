@@ -33,6 +33,13 @@
    states with no transition.
    -------------------------------------------------------------------------- */
 
+/* overflow-x: hidden on body breaks position: sticky.
+   Set ONLY on html -- stops horizontal scroll without
+   killing sticky pill bar. */
+html {
+  overflow-x: clip !important;
+}
+
 /* Nav -- z-index above everything */
 .site-nav,
 .nav-toggle,
@@ -40,7 +47,9 @@
   z-index: 9999 !important;
 }
 
-/* Nav -- solid navy, no ghost, no blur, no shadow on mobile */
+/* Nav -- solid navy, no ghost, no blur, no shadow.
+   safe-area-inset-top pushes content below iOS browser chrome
+   so the logo is never clipped by the URL bar. */
 .site-nav,
 .site-nav.is-scrolled {
   background: var(--gl-navy) !important;
@@ -49,25 +58,24 @@
   box-shadow: none !important;
   border-bottom: none !important;
   transition: none !important;
-  padding-top: 0 !important;
+  padding-top: env(safe-area-inset-top, 0px) !important;
 }
 
-/* Nav inner -- reduced height on mobile so logo has no room to clip.
-   Padding-top pushes content away from the very top of the bar. */
+/* Nav inner -- 60px on mobile, logo centered */
 .nav-inner {
   height: 60px !important;
   align-items: center !important;
   padding-top: 0 !important;
 }
 
-/* Logo -- sized to fit cleanly inside 60px nav with breathing room */
+/* Logo -- sized to fit inside 60px nav with breathing room */
 .nav-logo img {
   height: 28px !important;
   width: auto !important;
   display: block !important;
 }
 
-/* Projects pill bar -- sticky, flush below the 60px mobile nav */
+/* Projects pill bar -- sticky, flush below 60px mobile nav */
 .projects-header,
 .projects-header.is-scrolled {
   position: sticky !important;
@@ -294,7 +302,7 @@
   display: flex !important;
   flex-wrap: nowrap !important;
   justify-content: center !important;
-  overflow-x: visible !important;
+  overflow-x: hidden !important;
   gap: 0.4rem !important;
   padding: 0 0.5rem !important;
 }
