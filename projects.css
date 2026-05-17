@@ -14,9 +14,12 @@
 }
 
 /* Force the site nav to solid navy on the projects page.
-   No hero video means the ghost-transparent default renders as white. */
+   No hero video means the ghost-transparent default renders as white.
+   z-index explicitly set above --z-overlay -- cinematic-content sits at
+   --z-overlay and would otherwise paint over the fixed nav. */
 .site-nav {
   background: var(--gl-navy) !important;
+  z-index: 9999 !important;
 }
 
 .projects-header.is-scrolled {
