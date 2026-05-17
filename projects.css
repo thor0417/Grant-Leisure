@@ -6,10 +6,9 @@
    ============================================================= */
 
 .projects-header {
-  padding-top: 72px; /* Exact nav height -- prevents content sliding under fixed nav */
   background: var(--gl-navy);
   position: sticky;
-  top: 0;
+  top: 72px; /* Sits flush below the 72px main nav -- not behind it */
   z-index: var(--z-overlay);
   transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
