@@ -18,39 +18,29 @@
 
 
 /* --------------------------------------------------------------------------
-   FIX 1 -- Nav: solid opaque navy on mobile, no blur, no shadow
-   AUDIT REV 3: Previous "box-shadow cutting through logo" diagnosis was
-   wrong. The actual issue: .site-nav uses rgba(50,62,72,0.75) +
-   backdrop-filter blur. On mobile browsers (Brave iOS especially)
-   backdrop-filter renders inconsistently or transparently, causing:
-   (a) translucent navy band bleeds visibly across the logo's lower edge
-   (b) entire nav "disappears" on scroll when blur compositing fails
-   Fix: force fully opaque navy background, kill backdrop-filter, kill the
-   transition. Same treatment for the projects-page pill bar.
+   FIX 1 -- Nav stack above cinematic content + suppress shadow bar
+   AUDITED: --z-modal was uncertain (tokens.css not in this scope) and the
+   live site showed cinematic content still winning. Hardcoded 9999 removes
+   the dependency. Comment explains the override.
+
+   Separately, .site-nav.is-scrolled carries a box-shadow that on mobile
+   reads as a horizontal line cutting through the GLI logo. Suppress it
+   here so the logo lockup stays visually clean.
    -------------------------------------------------------------------------- */
 
 .site-nav,
 .nav-toggle,
 .nav-links {
-  z-index: 9999 !important;
+  /* 9999 -- explicit override of any cinematic-layer z-index (projects page).
+     Hardcoded because --z-modal could not be verified to outrank cinematic
+     content; this is the deliberate exception to the no-magic-numbers rule. */
+  z-index: 9999;
 }
 
 .site-nav,
 .site-nav.is-scrolled {
-  background: var(--gl-navy) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
-  border-bottom: none !important;
-  transition: none !important;
-}
-
-/* Projects-page pill bar -- same opaque treatment so it doesn't dissolve */
-.projects-header,
-.projects-header.is-scrolled {
-  background: var(--gl-navy) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  box-shadow: none;
+  border-bottom: none;
 }
 
 
@@ -91,29 +81,18 @@
 
 
 /* --------------------------------------------------------------------------
-   FIX 4 -- Marquee: compact item box AND smaller logos
-   AUDIT REV 3: .marquee__item is fixed width:180px height:90px in
-   components.css. Scaling only the img leaves the container at full
-   desktop size with 3rem gaps, so logos look like they have huge spacing.
-   Shrink the container, shrink the gap, shrink the per-logo attribute
-   scales (those won on specificity even with !important on the base img).
+   FIX 4 -- Marquee: compact scale and spacing
+   Actual classes use BEM: .marquee__track and .marquee__item (not
+   .marquee-track). Reduce logo size + gap so the strip reads as a deliberate
+   trust band, not a wall of brand chrome on a narrow viewport.
    -------------------------------------------------------------------------- */
 
 .marquee__track {
-  gap: 1rem !important;
-  padding-inline: 1rem !important;
+  gap: 1.5rem;
 }
 
-.marquee__item {
-  width: 110px !important;
-  height: 55px !important;
-}
-
-/* Every per-logo [alt="..."] selector in components.css needs defeating.
-   Combined selector wins on specificity + !important. */
-.marquee__item img,
-.marquee__item img[alt] {
-  transform: none !important;
+.marquee__item img {
+  transform: scale(0.55);
 }
 
 
@@ -205,24 +184,21 @@
 
 
 /* --------------------------------------------------------------------------
-   FIX 6 -- Team carousel: natural 1:1 aspect-ratio, face centered
-   AUDIT REV 3: Forcing height:280px with object-position:center 20% clipped
-   Robert's hair and tight-cropped Keith. The .team-card__img-wrap has a
-   natural aspect-ratio:1/1 in components.css -- at mobile width that gives
-   ~340px tall, plenty for the full face. Just override the desktop's
-   object-position:center top (which clips chins) to center, and let the
-   container size itself.
+   FIX 6 -- Team carousel: tighter section padding, taller portrait crop
+   Actual section id is #leadership. Photos crop to top to keep faces in
+   frame at the increased height.
    -------------------------------------------------------------------------- */
 
 #leadership {
-  padding-block: 3rem !important;
+  padding-block: 3rem;
 }
 
-.team-card__img-wrap img,
-.team-card--keith .team-card__img-wrap img {
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center center !important;
+.team-card__img-wrap img {
+  height: 280px;
+  object-fit: cover;
+  /* center 20% -- preserves the face mid-frame without clipping the top
+     of the head, which object-position: top was doing on every portrait */
+  object-position: center 20%;
 }
 
 
@@ -301,15 +277,45 @@
 
 
 /* --------------------------------------------------------------------------
-   FIX 9 -- Cinematic rows: text scaled down for mobile viewport
+   FIX 9 -- Cinematic rows: drop 16:9 ratio, give content room to breathe
+   AUDIT REV 4: .project-row-cinematic has aspect-ratio:16/9 in projects.css.
+   On a 390px viewport that resolves to 219px tall -- nowhere near enough
+   space for the location pill + title + teaser + button + padding stack,
+   which needs ~380px. Content overflowed upward and got covered by the
+   sticky pill header on scroll. Replace the ratio with min-height, clip
+   overflow, scale text down so it fits cleanly.
+
+   Also lift .projects-header above cinematic content so even if a stray
+   layout pixel overlaps, the pills win with their opaque navy background.
    -------------------------------------------------------------------------- */
 
+.project-row-cinematic {
+  aspect-ratio: auto !important;
+  min-height: 420px !important;
+  overflow: hidden !important;
+}
+
+.cinematic-content {
+  padding: 1.5rem 1.25rem !important;
+}
+
 .cinematic-title {
-  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-size: clamp(1.6rem, 5vw, 2.2rem) !important;
+  margin-bottom: 0.75rem !important;
 }
 
 .cinematic-teaser {
-  font-size: 1rem;
+  font-size: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.cinematic-location {
+  margin-bottom: 0.75rem !important;
+}
+
+/* Pill header must outrank cinematic content so it never half-renders */
+.projects-header {
+  z-index: 200 !important;
 }
 
 
