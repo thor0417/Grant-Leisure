@@ -187,7 +187,7 @@
       if (img && imgWrap && !skipParallax) {
         imgWrap.style.overflow    = 'hidden';
         img.style.transformOrigin = 'center center';
-        img.style.willChange      = 'transform';
+
 
         gsap.fromTo(img,
           { scale: 1 },
