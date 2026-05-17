@@ -43,6 +43,7 @@ html {
 .nav-logo img {
   height: 28px !important;
   width: auto !important;
+  max-width: none !important;
   display: block !important;
 }
 
