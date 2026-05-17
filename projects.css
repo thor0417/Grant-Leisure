@@ -13,6 +13,12 @@
   transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
+/* Force the site nav to solid navy on the projects page.
+   No hero video means the ghost-transparent default renders as white. */
+.site-nav {
+  background: var(--gl-navy) !important;
+}
+
 .projects-header.is-scrolled {
   background: rgba(50, 62, 72, 0.75);
   backdrop-filter: blur(12px);
