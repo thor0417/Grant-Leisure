@@ -544,99 +544,89 @@
 
   /* Article: unwind absolute positioning, allow natural block flow */
   .project-row-cinematic {
-    aspect-ratio: unset; /* Defeat projects.css line 250 (16/9) */
-    height: auto;
-    position: static;
-    overflow: visible;
-    display: block;
+    aspect-ratio: unset !important;
+    height: auto !important;
+    min-height: 0 !important;
+    position: static !important;
+    overflow: visible !important;
+    display: block !important;
   }
 
   /* Image: was absolute fill of a 480px frame; now a real 260px block */
   .cinematic-image-wrap {
-    position: static;
-    width: 100%;
-    height: 260px;
-    overflow: hidden;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 260px !important;
+    overflow: hidden !important;
   }
 
   .cinematic-image-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
     object-position: center center;
   }
 
-  /* Content: was absolute overlay; now a normal block below the image.
-     Inherits text colors and padding from projects.css default rules.
-     The only override is positioning. */
+  /* Content: was absolute overlay; now a normal block below the image. */
   .cinematic-content {
-    position: static;
-    width: 100%;
-    max-width: 100%;
-    padding: 2rem 1.25rem;
+    position: static !important;
+    inset: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 2rem 1.25rem !important;
+    background: var(--gl-white) !important;
   }
 
   /* Panel: was a positioned sibling; now flows naturally below content */
   .cinematic-panel {
-    position: static;
-    width: 100%;
+    position: static !important;
+    width: 100% !important;
   }
 
   /* ----------------------------------------------------------------------
      CINEMATIC VISUAL STYLING  match editorial appearance below the image.
-
-     With positioning unwound, the text now sits below the image instead
-     of overlaid on it. The desktop cinematic colors (white text, green
-     pill location, text shadows for image contrast) all need to flip to
-     editorial styling (dark text on white, green text-only location, no
-     shadows).
      ---------------------------------------------------------------------- */
 
-  /* Location: was a green pill (white text on green background) overlaid
-     on the image. Now sits on white below the image, so it should read
-     as the green uppercase line that editorial rows use. */
   .cinematic-location {
-    display: block;
-    background: transparent;
-    color: var(--gl-green);
-    padding: 0;
-    border-radius: 0;
-    margin-bottom: var(--space-xs);
-    font-size: var(--text-sm);
-    letter-spacing: var(--tracking-widest);
-    text-transform: uppercase;
+    display: block !important;
+    background: transparent !important;
+    color: var(--gl-green) !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    margin-bottom: var(--space-xs) !important;
+    font-size: var(--text-sm) !important;
+    letter-spacing: var(--tracking-widest) !important;
+    text-transform: uppercase !important;
+    width: fit-content !important;
   }
 
-  /* Title: was white-on-image with text-shadow for contrast. Now navy
-     on white, no shadow. */
   .cinematic-title {
-    color: var(--gl-navy);
-    text-shadow: none;
-    font-size: clamp(1.5rem, 6vw, 2rem);
-    margin-bottom: var(--space-md);
+    color: var(--gl-navy) !important;
+    text-shadow: none !important;
+    font-size: clamp(1.5rem, 6vw, 2rem) !important;
+    margin-bottom: var(--space-md) !important;
   }
 
-  /* Teaser: was white-on-image with text-shadow. Now navy at 75% opacity
-     to match editorial .project-teaser. */
   .cinematic-teaser {
-    color: var(--gl-navy);
-    opacity: 0.75;
-    text-shadow: none;
-    font-size: var(--text-body);
-    line-height: var(--leading-loose);
-    margin-bottom: var(--space-lg);
+    color: var(--gl-navy) !important;
+    opacity: 0.75 !important;
+    text-shadow: none !important;
+    font-size: var(--text-body) !important;
+    line-height: var(--leading-loose) !important;
+    margin-bottom: var(--space-lg) !important;
   }
 
-  /* Trigger: was white text. Now green to match editorial. */
   .cinematic-trigger {
-    color: var(--gl-green);
+    color: var(--gl-green) !important;
   }
 
-  /* Kill the bottom-third gradient scrim on the image. The scrim existed
-     to make overlaid text readable; with text now below the image, the
-     scrim just darkens the bottom of the image for no reason. */
   .cinematic-image-wrap::after {
-    display: none;
+    display: none !important;
   }
 
   /* ----------------------------------------------------------------------
