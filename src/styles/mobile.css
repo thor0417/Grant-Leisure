@@ -43,6 +43,7 @@
      before the hero video paints
      ====================================================================== */
 
+  html,
   body {
     background: transparent;
   }
@@ -179,11 +180,10 @@
 
   .bento {
     position: relative;
-    display: block; /* break the grid context inherited from components.css */
+    display: block;
     touch-action: pan-y;
-    /* Fixed height locks the container so card swaps never reflow.
-       Tuned to the longest service copy at 390px width. */
-    height: 420px;
+    height: 380px;
+    overflow: hidden;
   }
 
   .bento__card {
@@ -192,12 +192,64 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--duration-default) var(--ease-stellar);
+    border-left: none; /* suppress green spine accent on mobile */
   }
 
   .bento__card.is-active {
     opacity: 1;
     pointer-events: auto;
-    position: relative; /* active card drives the container height naturally */
+    position: absolute; /* keep absolute so container height stays fixed */
+  }
+
+  /* Bento carousel controls -- match team and testimonials arrow style */
+  .bento-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  .bento-arrow {
+    background: none;
+    border: none;
+    color: var(--gl-white);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0;
+    min-height: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+  }
+
+  .bento-arrow:hover {
+    opacity: 1;
+  }
+
+  .bento-dots {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .bento-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gl-white);
+    opacity: 0.3;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: opacity var(--duration-fast) var(--ease-stellar);
+  }
+
+  .bento-dot.is-active {
+    opacity: 1;
   }
 
 
