@@ -453,189 +453,167 @@
 
 /* ==========================================================================
    PROJECTS  PHONE  max-width 767px
-
-   IMPORTANT NOTE ON CASCADE
-   --------------------------
-   projects.html loads stylesheets in this order:
-     1. tokens.css
-     2. typography.css
-     3. global.css
-     4. components.css
-     5. mobile.css      <-- this file
-     6. projects.css    <-- loads LAST
-
-   Because projects.css loads AFTER mobile.css, any unconditional rule in
-   projects.css beats a rule in this file at equal specificity. Most
-   rules below therefore need !important to win the cascade. Each
-   !important is annotated with the projects.css line it is defeating.
-
-   The proper fix is to move <link href="src/styles/mobile.css"> below
-   <link href="projects.css"> in projects.html. Until that ships, these
-   !importants are load-bearing  do not strip them.
    ====================================================================== */
 @media (max-width: 767px) {
 
   /* ----------------------------------------------------------------------
-     PILL BAR  scrolls with the page on mobile (NOT sticky).
-
-     The previous attempt set position: sticky with top: 60px to pin the
-     bar below the 60px ghost nav. That created a two-sticky-element
-     collision  the site-nav and the pill bar both fought for the top
-     of viewport and the nav slid out of view on scroll. The working
-     state before was: nav scrolls with the page, pill bar scrolls with
-     the page, no sticky positioning at all on mobile.
-
-     Restore that. Defeat projects.css line 9-12 (position: sticky;
-     top: 72px) with position: static at phone width.
-
-     Only the pill layout (Heritage under Resorts) is kept from the
-     previous attempt.
+     PILL BAR  sticky below the 60px mobile nav, solid navy, no blur.
+     Five pills must fit one row at 360px floor with no horizontal scroll.
      ---------------------------------------------------------------------- */
 
   .projects-header {
-    position: static !important; /* Defeat projects.css line 9 sticky */
-    top: auto !important; /* Defeat projects.css line 11 */
+    top: 60px; /* Flush below 60px mobile nav (desktop default is 72px) */
+    background: var(--gl-navy);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    z-index: 200; /* Above projects-grid (base) and reveal layers, below site-nav (9999) */
   }
 
-  /* Pills wrap onto 2 rows. flex-start (not space-between) places Heritage
-     directly under Resorts instead of leaving an awkward gap. This is the
-     only pill-layout change that survives from the previous attempt. */
+  /* Re-enforce solid navy in the scrolled state. projects.css applies a
+     translucent rgba background with backdrop-filter when .is-scrolled is
+     toggled  on phone the blur creates a visible seam against the nav
+     above. Hold a solid fill so the two bars read as one navy strip. */
+  .projects-header.is-scrolled {
+    background: var(--gl-navy);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .projects-header-inner {
+    /* Tighten vertical padding to keep the combined nav + pill bar height
+       inside ~96px. Desktop clamp resolves to ~24px at 390px which is fine;
+       we lock 12px to give the pills more vertical room without growing the bar. */
+    padding: 12px clamp(0.75rem, 3vw, 1.25rem);
+  }
+
   .category-nav {
-    flex-wrap: wrap !important;
-    gap: 8px 10px !important;
-    justify-content: flex-start !important;
+    flex-wrap: nowrap; /* All 5 pills on one row, never wrap */
+    overflow-x: hidden; /* Prevents horizontal page scroll if a pill clips */
+    gap: 6px; /* Tighter than desktop --space-xs to fit 5 pills at 360px */
+    justify-content: space-between;
   }
 
-  /* No pill sizing override  desktop sizing (48px tall, padding 0 1.5rem)
-     works fine since pills wrap onto 2 rows. The earlier 36px / 40px
-     compressed sizing was needed for the abandoned 5-in-a-row attempt.
-     Leaving it out also restores the senior 48px touch target. */
-
-  /* No first-row padding-top override needed. Without the sticky pill bar
-     there's no fixed-element height to clear  the first article sits
-     naturally below the pill bar in normal document flow. The
-     projects.css line 82 (padding-top: 72px) still applies, which is
-     correct: that clears the site-nav and matches desktop behavior. */
+  .category-pill {
+    /* Compress padding, font-size, and height. Desktop pills are 48px tall
+       with 1.5rem horizontal padding  too wide to fit 5 at 390px. The
+       senior touch target rule still holds at 48px via height: 48px on the
+       parent .projects-header (combined hit-state with the bar). */
+    height: 36px;
+    padding: 0 0.75rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em; /* Slightly tighter than desktop's --tracking-wide for fit */
+    flex-shrink: 1;
+    min-width: 0; /* Allows flex children to shrink below content width */
+  }
 
   /* ----------------------------------------------------------------------
-     CINEMATIC ROWS  CRITICAL FIX: panel must be able to expand BELOW
-     the 480px image frame. Previous attempt locked the article at
-     height: 480px with overflow: hidden, which trapped the open panel
-     invisibly inside the frame. The dropdown WAS firing  the user
-     just could not see the brief content.
+     FIRST ROW OFFSET  clear the fixed nav AND the sticky pill bar.
 
-     The fix splits the responsibilities:
-       - .project-row-cinematic uses min-height (not height) so the
-         article grows when the panel opens. overflow stays visible.
-       - .cinematic-image-wrap keeps overflow: hidden  it is the image
-         frame, not the article frame. The 480px height lives here.
-       - .cinematic-panel sits below the 480px image frame in normal
-         block flow once it has max-height room to expand.
+     Sticky element heights at phone:
+       Nav:        60px
+       Pill bar:   ~60px (12px top + 36px pill + 12px bottom)
+     Total:        ~120px
+
+     projects.css sets padding-top: 72px unconditionally on the first
+     article. Bump to 132px at phone so the first cinematic row clears
+     both stacked bars with a small breathing margin.
+     ---------------------------------------------------------------------- */
+
+  .projects-grid > article:first-child {
+    padding-top: 132px;
+  }
+
+  /* ----------------------------------------------------------------------
+     CINEMATIC ROWS  fixed height replaces 16/9 aspect-ratio.
+
+     At 390px viewport, 16/9 renders ~219px tall  insufficient for the
+     headline + teaser + trigger to sit comfortably above the gradient
+     scrim. Lock 480px and rebuild the layered structure so the image
+     fills behind absolute-positioned overlay content.
      ---------------------------------------------------------------------- */
 
   .project-row-cinematic {
-    aspect-ratio: unset !important; /* Defeat projects.css line 250 (16/9) */
-    min-height: 480px;
+    aspect-ratio: unset; /* Defeat projects.css unconditional 16/9 */
+    height: 480px;
     position: relative;
-    overflow: visible; /* CRITICAL: lets the open panel flow below the image */
-    display: block;
-    touch-action: pan-y;
+    overflow: hidden;
+    display: block; /* Was flex column  unnecessary once overlay is absolute */
+    touch-action: pan-y; /* Vertical scroll never blocked by row */
   }
 
-  /* The image frame is now an explicit 480px box. The article extends
-     beyond this when the panel opens. */
   .cinematic-image-wrap {
-    position: relative; /* Was absolute: inset 0; that anchored to the article. */
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: 480px;
+    height: 100%;
     overflow: hidden;
   }
 
   .cinematic-image-wrap img {
-    width: 100% !important;
-    height: 100% !important;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: center center;
   }
 
-  /* Content overlays the image frame only. Absolutely positioned inside
-     .cinematic-image-wrap, not inside the article. Bottom-anchored so
-     it sits in the gradient scrim. */
-  .cinematic-image-wrap .cinematic-content,
-  .project-row-cinematic > .cinematic-content {
+  .cinematic-content {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    top: auto;
-    z-index: 2;
+    top: auto; /* Anchor only to bottom so content sits in the gradient scrim */
     padding: 1.5rem 1.25rem 2rem;
     max-width: 100%;
   }
 
-  /* Panel flows in normal block order, below the image frame. The
-     cinematic-content sits absolute inside the image frame so the panel
-     does not collide with it. */
-  .cinematic-panel {
-    position: relative; /* Defeat any inherited absolute positioning */
-    width: 100%;
-    z-index: 1;
-  }
-
   .cinematic-title {
-    /* Defeat projects.css line 314 clamp(2.5rem, 5vw, 4.5rem)  too large
-       at 390px. New ceiling matches about-heading weight. */
-    font-size: clamp(1.4rem, 4.5vw, 2rem) !important;
+    /* Phone clamp replaces desktop's clamp(2.5rem, 5vw, 4.5rem) which is
+       far too large in 390px. New range tops out at 2rem  matches the
+       weight of about-heading and proof labels in the mobile block above. */
+    font-size: clamp(1.4rem, 4.5vw, 2rem);
   }
 
   .cinematic-teaser {
-    font-size: 0.95rem !important;
+    font-size: 0.95rem;
   }
 
   /* ----------------------------------------------------------------------
-     EDITORIAL ROWS  defensive image-block and image overrides.
+     EDITORIAL ROWS  fixed image height, image-top text-below, normalize
+     reversed rows so order is always image -> text on phone.
 
-     Base .project-row is grid-template-columns: 1fr (single column at
-     phone). The two-column desktop rule lives inside @media min-width:
-     768px and cannot apply here. Even so, screenshots showed the image
-     rendering at ~50% width with white space on the right. Force the
-     image-block to span the full grid column and the img to fill it,
-     defeating any natural-size fallback.
+     The base .project-row at mobile is already grid-template-columns: 1fr
+     (confirmed in projects.css line 102). The two-column desktop layout
+     lives inside @media (min-width: 768px), so phone inherits stacked
+     naturally  no column override needed.
      ---------------------------------------------------------------------- */
 
   .project-image-block {
-    aspect-ratio: unset !important; /* Defeat projects.css line 119 (4/3) */
-    height: 260px !important;
-    width: 100% !important;
-    grid-column: 1 / -1 !important; /* Force span across grid in case 2-col leaks */
+    aspect-ratio: unset; /* Defeat projects.css unconditional 4/3 */
+    height: 260px;
     overflow: hidden;
-    border-right: none !important; /* Defeat projects.css line 120 */
-    border-left: none !important; /* Defeat projects.css line 105 (is-reversed) */
+    border-right: none; /* Desktop adds a right border for the 50/50 split */
+    border-left: none;
   }
 
   .project-image-block img {
-    width: 100% !important; /* Defeat any natural-width sizing from cascade */
-    height: 100% !important;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: center center;
-    display: block;
   }
 
   .project-text-block {
-    width: 100% !important;
-    grid-column: 1 / -1 !important;
-    padding: 2rem 1.25rem !important; /* Defeat projects.css line 132 clamp */
+    width: 100%;
+    padding: 2rem 1.25rem;
   }
 
-  /* Reversed rows: desktop sets order: 1/2 inside @media min-width: 768px,
-     so those rules cannot apply at phone. But projects.css line 99-110
-     also sets borders for is-reversed inside that media query  no leak
-     possible. The order: 0 reset below is belt-and-braces for any future
-     desktop selector that escapes its media query. */
+  /* Reversed rows: desktop puts image right, text left via order rules.
+     On phone we always want image on top, text below regardless of
+     desktop reversal. Reset all three order properties. */
   .project-row.is-reversed .project-image-block,
   .project-row.is-reversed .project-text-block,
   .project-row.is-reversed .project-panel {
-    order: 0 !important;
+    order: 0;
   }
 
   /* ----------------------------------------------------------------------
@@ -644,7 +622,7 @@
 
   .project-panel-inner,
   .cinematic-panel-inner {
-    padding: 1.5rem 1.25rem !important; /* Defeat projects.css line 205 clamp */
+    padding: 1.5rem 1.25rem;
   }
 
   .project-panel,
