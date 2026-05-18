@@ -1287,7 +1287,7 @@
         pill.addEventListener('click', function (e) {
           e.preventDefault();
           filterTo(pill.getAttribute('data-category'));
-          document.querySelector('.projects-header').scrollIntoView({ behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         });
       });
 
