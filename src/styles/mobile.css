@@ -194,7 +194,7 @@
     overflow: hidden;
     /* Fixed height so card swaps never resize the container.
        Tuned to longest service copy at 390px width. */
-    height: 420px;
+    height: 360px;
     touch-action: pan-y;
   }
 
