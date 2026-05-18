@@ -583,6 +583,63 @@
   }
 
   /* ----------------------------------------------------------------------
+     CINEMATIC VISUAL STYLING  match editorial appearance below the image.
+
+     With positioning unwound, the text now sits below the image instead
+     of overlaid on it. The desktop cinematic colors (white text, green
+     pill location, text shadows for image contrast) all need to flip to
+     editorial styling (dark text on white, green text-only location, no
+     shadows).
+     ---------------------------------------------------------------------- */
+
+  /* Location: was a green pill (white text on green background) overlaid
+     on the image. Now sits on white below the image, so it should read
+     as the green uppercase line that editorial rows use. */
+  .cinematic-location {
+    display: block;
+    background: transparent;
+    color: var(--gl-green);
+    padding: 0;
+    border-radius: 0;
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+  }
+
+  /* Title: was white-on-image with text-shadow for contrast. Now navy
+     on white, no shadow. */
+  .cinematic-title {
+    color: var(--gl-navy);
+    text-shadow: none;
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    margin-bottom: var(--space-md);
+  }
+
+  /* Teaser: was white-on-image with text-shadow. Now navy at 75% opacity
+     to match editorial .project-teaser. */
+  .cinematic-teaser {
+    color: var(--gl-navy);
+    opacity: 0.75;
+    text-shadow: none;
+    font-size: var(--text-body);
+    line-height: var(--leading-loose);
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Trigger: was white text. Now green to match editorial. */
+  .cinematic-trigger {
+    color: var(--gl-green);
+  }
+
+  /* Kill the bottom-third gradient scrim on the image. The scrim existed
+     to make overlaid text readable; with text now below the image, the
+     scrim just darkens the bottom of the image for no reason. */
+  .cinematic-image-wrap::after {
+    display: none;
+  }
+
+  /* ----------------------------------------------------------------------
      EDITORIAL ROWS  fixed image height, image-top text-below, normalize
      reversed rows so order is always image -> text on phone.
 
