@@ -1210,29 +1210,39 @@
 }
 
 .carousel-btn {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 2px solid var(--gl-green-vivid);
+  /* Stripped-back arrow -- no circle, no border. 48px target preserved. */
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
   background: none;
-  color: var(--gl-green-vivid);
-  font-size: 1.25rem;
+  color: var(--gl-navy); /* Default surface; testimonials override below for navy bg */
+  font-size: 1.75rem;
+  line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color var(--duration-fast) var(--ease-stellar),
-              color var(--duration-fast) var(--ease-stellar);
+  transition: color var(--duration-fast) var(--ease-stellar);
 }
 
 .carousel-btn:hover {
-  background-color: var(--gl-green);
-  color: var(--gl-white);
+  color: var(--gl-green-vivid);
 }
 
 .carousel-btn:focus-visible {
-  outline: 3px solid var(--gl-green);
-  outline-offset: 3px;
+  outline: 2px solid var(--gl-green-vivid);
+  outline-offset: 4px;
+}
+
+/* Testimonials sit on navy -- arrows need light contrast */
+#testimonials .carousel-btn {
+  color: var(--gl-white);
+}
+
+#testimonials .carousel-btn:hover {
+  color: var(--gl-green-vivid);
 }
 
 /* ============================================================
