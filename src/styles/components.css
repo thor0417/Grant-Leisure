@@ -150,7 +150,7 @@
 
 .nav-link.nav-cta:hover,
 .nav-link.nav-cta:focus-visible {
-  background: var(--gl-blue);
+  background: var(--gl-navy);
   color: var(--gl-white);
 }
 
@@ -991,11 +991,6 @@
 .marquee__item img[alt="Parques Reunidos"]                 { transform: scale(1.05); } /* was 0.90 -- too small */
 .marquee__item img[alt="Village Roadshow"]                 { transform: scale(0.85); } /* was 0.70 -- too small */
 .marquee__item img[alt="Universal"]                        { transform: scale(0.85); } /* was 0.75 -- too small */
-
-.marquee__item img[alt="NBC Universal"] {
-  opacity: 1;
-  filter: grayscale(0%) opacity(1);
-}
 
 .marquee__item img:hover {
   filter: grayscale(0%) opacity(1);
