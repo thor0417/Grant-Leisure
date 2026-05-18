@@ -542,6 +542,7 @@
     position: static;
     overflow: visible;
     display: block;
+    contain: layout; /* Isolate layout calculation so scroll doesn't repaint nav */
   }
 
   article.project-row-cinematic .cinematic-image-wrap {
@@ -629,6 +630,7 @@
     overflow: hidden;
     border-right: none;
     border-left: none;
+    contain: layout; /* Isolate layout calculation so scroll doesn't repaint nav */
   }
 
   article.project-row .project-image-block img {
