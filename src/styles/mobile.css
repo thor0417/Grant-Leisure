@@ -488,8 +488,8 @@
 
   .category-nav {
     flex-wrap: wrap; /* Allows Heritage to wrap under Resorts on 2nd row */
-    overflow-x: hidden; /* Prevents horizontal page scroll if a pill clips */
-    gap: 6px; /* Tighter than desktop --space-xs to fit 5 pills at 360px */
+    overflow-x: hidden;
+    gap: 6px;
     justify-content: flex-start; /* Heritage sits under Resorts, not pushed right */
   }
 
@@ -524,46 +524,36 @@
   }
 
   /* ----------------------------------------------------------------------
-     CINEMATIC ROWS  render as editorial cards on mobile.
+     CINEMATIC ROWS  unstacked on mobile.
 
-     Desktop has two row patterns: editorial (image + text side-by-side)
-     and cinematic (full-bleed image with overlay text). On mobile,
-     screen real estate kills the cinematic concept  overlay text fights
-     the image, the 480px landscape frame crops subjects aggressively,
-     and the brief drop-down gets trapped inside the framed article.
+     Desktop cinematics overlay text on a full-bleed image using absolute
+     positioning. On mobile we want the same content stacked vertically
+     just like editorial rows: image on top, then location, title, teaser,
+     trigger, then the brief panel expanding below.
 
-     Solution: force cinematics to render as editorials on phone. Every
-     project becomes the same card pattern:
+     The HTML structure is already compatible  cinematic and editorial
+     articles have the same 3-child order (image-wrap, content, panel).
+     The only thing making cinematics LOOK different is absolute
+     positioning. Strip the absolutes, give the image a 260px frame,
+     and the content stacks naturally underneath.
 
-       [ image, full width, 260px tall ]
-       [ green location label ]
-       [ project title ]
-       [ teaser, 2-3 lines ]
-       [ Read the Brief trigger ]
-       [ brief panel expands here when opened ]
-
-     The HTML stays exactly as is. We just override the cinematic-specific
-     positioning so the article reads as a vertical stack of blocks.
-     Drop-down works identically to editorial because the structure is now
-     identical.
+     Intentionally minimal. No background overrides, no padding overrides,
+     no color or text-shadow overrides. Anything not touched here keeps
+     whatever projects.css gave it.
      ---------------------------------------------------------------------- */
 
-  /* Article: vertical stack, grows naturally with content */
+  /* Article: unwind absolute positioning, allow natural block flow */
   .project-row-cinematic {
     aspect-ratio: unset; /* Defeat projects.css line 250 (16/9) */
     height: auto;
-    min-height: 0;
-    position: static; /* Defeat desktop relative positioning */
+    position: static;
     overflow: visible;
     display: block;
-    background: var(--gl-white); /* Card background matches editorial */
-    border-bottom: 1px solid rgba(50, 62, 72, 0.12); /* Match .project-row border */
   }
 
-  /* Image: full width, 260px tall  matches editorial .project-image-block */
+  /* Image: was absolute fill of a 480px frame; now a real 260px block */
   .cinematic-image-wrap {
     position: static;
-    inset: auto;
     width: 100%;
     height: 260px;
     overflow: hidden;
@@ -576,73 +566,20 @@
     object-position: center center;
   }
 
-  /* Kill the gradient scrim on mobile  text now sits below the image,
-     not on top of it, so the scrim is unnecessary and creates a muddy
-     bottom edge on the image. */
-  .cinematic-image-wrap::after {
-    display: none;
-  }
-
-  /* Content: was absolute-positioned overlay; now a normal block below
-     the image. Padding matches editorial .project-text-block. */
+  /* Content: was absolute overlay; now a normal block below the image.
+     Inherits text colors and padding from projects.css default rules.
+     The only override is positioning. */
   .cinematic-content {
     position: static;
-    inset: auto;
     width: 100%;
     max-width: 100%;
     padding: 2rem 1.25rem;
-    background: var(--gl-white);
-    z-index: auto;
   }
 
-  /* Location label: was a green pill on the image; now reads as the
-     uppercase green location line that editorial rows use. Strip the
-     pill background, padding, and rounded corners. */
-  .cinematic-location {
-    display: block;
-    background: transparent;
-    color: var(--gl-green); /* Was white-on-green pill */
-    padding: 0;
-    border-radius: 0;
-    margin-bottom: var(--space-xs);
-    /* Match .project-location: caps, tracked, small */
-    font-size: var(--text-sm);
-    letter-spacing: var(--tracking-widest);
-    text-transform: uppercase;
-  }
-
-  /* Title: dark navy on white now (was white on image). Drop the text
-     shadow that was carrying it against the image background. */
-  .cinematic-title {
-    color: var(--gl-navy);
-    text-shadow: none;
-    font-size: clamp(1.5rem, 6vw, 2rem);
-    margin-bottom: var(--space-md);
-  }
-
-  /* Teaser: dark on white now. Drop the text shadow and white opacity. */
-  .cinematic-teaser {
-    color: var(--gl-navy);
-    opacity: 0.75; /* Match .project-teaser */
-    text-shadow: none;
-    font-size: var(--text-body);
-    line-height: var(--leading-loose);
-    margin-bottom: var(--space-lg);
-    /* No line-clamp  let it run natural like editorial teasers */
-  }
-
-  /* Trigger: green on white now (was white on image) */
-  .cinematic-trigger {
-    color: var(--gl-green);
-  }
-
-  /* Panel: was a position: relative sibling that could get trapped.
-     Make it a clean block under the content, full width, no special
-     positioning. Identical to .project-panel behavior. */
+  /* Panel: was a positioned sibling; now flows naturally below content */
   .cinematic-panel {
     position: static;
     width: 100%;
-    z-index: auto;
   }
 
   /* ----------------------------------------------------------------------
