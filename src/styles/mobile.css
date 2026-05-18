@@ -210,7 +210,8 @@
   .bento__card.is-active {
     opacity: 1;
     pointer-events: auto;
-    position: relative;
+    /* Stays position: absolute (inherited from .bento__card). The container's
+       fixed height owns layout; the active card never pushes it. */
   }
 
   /* Accent cards (01 Market Analysis, 04 Funding Assistance) carry a 4px
@@ -240,7 +241,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-xl);
-    margin-top: var(--space-lg);
+    margin-top: var(--space-sm);
     padding-bottom: var(--space-lg);
   }
 
