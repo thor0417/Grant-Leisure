@@ -14,47 +14,42 @@
 
 @font-face {
   font-family: 'Instrument Serif';
-  src: url('assets/fonts/InstrumentSerif-Regular.ttf') format('truetype');
+  src: url('../../public/assets/fonts/InstrumentSerif-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: 'Instrument Serif';
-  src: url('assets/fonts/InstrumentSerif-Italic.ttf') format('truetype');
+  src: url('../../public/assets/fonts/InstrumentSerif-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
-
 @font-face {
   font-family: 'Inter Tight';
-  src: url('assets/fonts/InterTight-Regular.ttf') format('truetype');
+  src: url('../../public/assets/fonts/InterTight-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: 'Inter Tight';
-  src: url('assets/fonts/InterTight-Medium.ttf') format('truetype');
+  src: url('../../public/assets/fonts/InterTight-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: 'Inter Tight';
-  src: url('assets/fonts/InterTight-Black.ttf') format('truetype');
+  src: url('../../public/assets/fonts/InterTight-Black.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: 'Inter Tight';
-  src: url('assets/fonts/InterTight-Italic.ttf') format('truetype');
+  src: url('../../public/assets/fonts/InterTight-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
