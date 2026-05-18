@@ -192,7 +192,9 @@
     position: relative;
     display: block;
     overflow: hidden;
-    min-height: 320px;
+    /* Fixed height so card swaps never resize the container.
+       Tuned to longest service copy at 390px width. */
+    height: 420px;
     touch-action: pan-y;
   }
 
@@ -209,6 +211,14 @@
     opacity: 1;
     pointer-events: auto;
     position: relative;
+  }
+
+  /* Accent cards (01 Market Analysis, 04 Funding Assistance) carry a 4px
+     green left border on desktop. On mobile that spine creates a width
+     mismatch against the other cards in the same carousel slot, causing
+     a horizontal flicker on swipe. Normalize to the default 1px border. */
+  .bento__card--accent {
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   /* Defuse GSAP reveal: the carousel structure changes scroll-trigger geometry,
