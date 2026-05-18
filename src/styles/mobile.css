@@ -1,9 +1,312 @@
 /* ==========================================================================
-   MOBILE.CSS -- Grant Leisure "Visible Dominance" v2
-   Scope: Mobile overrides for index.html and projects.html
-   Breakpoint: max-width 767px enforced via @media inside this file
-   Target: 390px primary, 360px floor
-   Load order: after components.css and projects.css
-   Last Updated: 2026-05-17
-   ========================================================================== */
+   MOBILE.CSS  Grant Leisure "Visible Dominance" v2
+   Scope: phone (max-width 767px) and tablet (768px to 1279px) overrides for
+   index.html. Loads unconditionally after components.css. All overrides live
+   inside @media blocks below; nothing in this file applies at desktop width.
 
+   Locked components left untouched (no rules target their internals):
+     services bento carousel JS state,
+     team carousel JS state,
+     testimonials carousel JS state,
+     touch swipe JS on all three.
+
+   Flagged for the project owner:
+   1. Bento mobile carousel
+      Brief specifies .bento__card.is-active single-card carousel with arrow
+      and dot controls on mobile. components.css has no .is-active rule for
+      bento cards. index.html has no arrow or dot markup inside #expertise.
+      This file provides the container, absolute positioning, and is-active
+      reveal rule per brief, but no rules target non-existent control elements.
+      Carousel will activate only when JS toggles is-active on .bento__card
+      and matching control markup is added.
+
+   2. Projects pill bar
+      Brief calls for a sticky pill bar below the 60px nav. No such markup
+      exists in index.html (the bar lives in projects.html). Skipped.
+      Project-page styles belong in projects.css, not here.
+
+   3. Cinematic overlay rows
+      Desktop nav z-index is var(--z-modal) to clear projects.html cinematic
+      overlays. Mobile keeps the nav at the highest practical z-index for
+      the same reason.
+   ====================================================================== */
+
+
+/* ==========================================================================
+   PHONE  max-width 767px
+   Target 390px primary, 360px floor.
+   ====================================================================== */
+@media (max-width: 767px) {
+
+  /* ======================================================================
+     NAV  solid navy, no glass, fixed 60px height
+     ====================================================================== */
+
+  /* Both default and scrolled states forced solid; matching specificity
+     against components.css .site-nav.is-scrolled rule (0,0,2,0). */
+  .site-nav,
+  .site-nav.is-scrolled {
+    background: var(--gl-navy);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+    transition: none;
+    z-index: 9999; /* Above cinematic overlays on projects.html and any in-flow content */
+  }
+
+  .nav-inner {
+    height: 60px;
+  }
+
+  /* Logo: 28px tall, intrinsic width. Global img reset sets max-width: 100%,
+     which would clamp the logo to its parent container; !important required
+     because the global selector is `img` (0,0,0,1) and lives in global.css
+     which we cannot reorder, and width: auto alone will not defeat
+     max-width: 100% on a wide nav cell. */
+  .nav-logo img {
+    height: 28px;
+    width: auto;
+    max-width: none !important; /* defeat global img max-width: 100% */
+  }
+
+  /* Hamburger sits above all content including cinematic overlays */
+  .nav-toggle {
+    z-index: 9999;
+    position: relative;
+  }
+
+  /* Open menu panel must also sit above all content */
+  .nav-links {
+    z-index: 9999;
+    top: 60px;
+  }
+
+
+  /* ======================================================================
+     HERO  headline scaled for 390px viewport, video untouched
+     ====================================================================== */
+
+  .hero-headline {
+    /* Tighter clamp than desktop floor (3.25rem). Two-line wrap stays clean
+       at 360px without horizontal scroll. */
+    font-size: clamp(2.5rem, 11vw, 3.25rem);
+    line-height: 1.05;
+  }
+
+
+  /* ======================================================================
+     LOGIC  verify no overflow at 360px floor
+     ====================================================================== */
+
+  .logic-stat {
+    /* Desktop clamp floor is 6rem which can press against 360px; tighten. */
+    font-size: clamp(4.5rem, 22vw, 6rem);
+  }
+
+  .logic-statement {
+    font-size: clamp(1.25rem, 5vw, 1.5rem);
+  }
+
+
+  /* ======================================================================
+     ABOUT  single column, illustration stacks below text, centered
+     ====================================================================== */
+
+  /* components.css already stacks .about-inner below 900px; we tune sizing. */
+  .about-heading {
+    /* Compress heading for 390px so two- and three-word lines read clean. */
+    font-size: clamp(1.75rem, 7vw, 2.25rem);
+  }
+
+  .about-figure {
+    /* Center the illustration block under the text and cap its width so it
+       does not dominate the column. */
+    align-self: center;
+    max-width: 85%;
+  }
+
+  .about-figure img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+
+  /* ======================================================================
+     PROOF  2x2 icon grid stays (components.css already does this).
+     Scale line stacks vertically; pipe dividers hidden.
+     ====================================================================== */
+
+  .proof-scale {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .proof-scale-divider {
+    display: none;
+  }
+
+
+  /* ======================================================================
+     REACH  full width map, centered statement
+     ====================================================================== */
+
+  .reach-map {
+    max-width: 100%;
+  }
+
+  .reach-map img {
+    width: 100%;
+    height: auto;
+  }
+
+  .reach-statement {
+    text-align: center;
+  }
+
+
+  /* ======================================================================
+     EXPERTISE / BENTO  single-card carousel scaffold
+
+     Cards stack to a single column at mobile in components.css. To convert
+     that stack into a carousel where only the .is-active card is visible,
+     we collapse the grid to a single relative container and absolutely
+     position the cards inside it. Only the card carrying .is-active renders.
+
+     touch-action: pan-y keeps vertical page scroll working while the
+     carousel JS handles horizontal swipe gestures.
+
+     No control markup exists in #expertise yet; arrow and dot rules will
+     be added when that markup ships.
+     ====================================================================== */
+
+  .bento {
+    position: relative;
+    display: block; /* break the grid context inherited from components.css */
+    touch-action: pan-y;
+    /* Reserve vertical space so the absolutely positioned card has room.
+       Min-height tuned to the longest service copy at 390px width. */
+    min-height: 320px;
+  }
+
+  .bento__card {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-default) var(--ease-stellar);
+  }
+
+  .bento__card.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    position: relative; /* active card drives the container height naturally */
+  }
+
+
+  /* ======================================================================
+     VALIDATION / MARQUEE
+     Gap reduced. Per-logo transform: scale(...) rules in components.css are
+     preserved by NOT writing any rule that sets transform on .marquee__item img.
+     ====================================================================== */
+
+  .marquee__track {
+    gap: 2rem;
+    align-items: center;
+  }
+
+
+  /* ======================================================================
+     LEADERSHIP / TEAM CAROUSEL  photo crop tuned for portrait viewport
+     ====================================================================== */
+
+  .team-carousel {
+    touch-action: pan-y;
+  }
+
+  .team-card__img-wrap {
+    /* Override aspect-ratio square at mobile so we can lock a fixed height. */
+    aspect-ratio: auto;
+    height: 280px;
+  }
+
+  .team-card__img-wrap img {
+    object-fit: cover;
+    object-position: center 25%; /* default head framing for all cards */
+  }
+
+
+  /* ======================================================================
+     TESTIMONIALS  verify no overflow at 360px
+     ====================================================================== */
+
+  .testimonials__carousel {
+    touch-action: pan-y;
+  }
+
+  .testimonial__quote p {
+    /* Desktop uses --text-body-lg (typically ~1.125rem). Hold a controlled
+       16px at 360px to prevent line-break orphans on long quotes. */
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+
+  /* ======================================================================
+     ENGAGE  single column, fields full width, contact stacks
+     ====================================================================== */
+
+  /* components.css drops .engage__inner to one column under 64rem already.
+     Here we stack the dual phone/contact row and let the address wrap. */
+  .engage__address {
+    white-space: normal; /* components.css forces nowrap; allow wrap on phones */
+  }
+
+  .engage__contact-row {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  /* components.css already collapses .engage-form to 1fr under 40rem.
+     No further override needed for field widths. */
+
+  .form-submit {
+    width: 100%;
+    align-self: stretch;
+  }
+
+
+  /* ======================================================================
+     FOOTER  legal centered at minimum legible size
+     ====================================================================== */
+
+  .footer__legal {
+    text-align: center;
+    font-size: var(--text-sm);
+  }
+
+}
+
+
+/* ==========================================================================
+   TABLET  min-width 768px and max-width 1279px
+
+   Desktop layout from components.css largely applies cleanly in this range.
+   The block below relieves edge-pressure spots only.
+   ====================================================================== */
+@media (min-width: 768px) and (max-width: 1279px) {
+
+  /* Bento drops to two columns at 48rem in components.css; three columns
+     only kick in at 72rem. Both behaviors are correct for tablet  no
+     override needed here. */
+
+  /* Engage stays single-column until 64rem (1024px), then becomes two-column.
+     The two-column form below 1024px would crowd; let components.css handle. */
+
+  /* Team carousel: components.css shifts to 33.333% width per card at 48rem.
+     At narrow tablet (~768px) that yields ~240px per card which is acceptable;
+     no override. */
+
+  /* Marquee gap on tablet sits between mobile (2rem) and desktop (3rem).
+     Hold the components.css 3rem  the wider viewport absorbs it. */
+}
