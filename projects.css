@@ -13,15 +13,13 @@
   transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
-/* Force the site nav to solid navy on the projects page at desktop.
+/* Force the site nav to solid navy on the projects page.
    No hero video means the ghost-transparent default renders as white.
-   Scoped to min-width: 768px -- on mobile the ghost nav is correct and
-   mobile.css handles z-index separately. */
-@media (min-width: 768px) {
-  .site-nav {
-    background: var(--gl-navy) !important;
-    z-index: 9999 !important;
-  }
+   z-index: 9999 beats cinematic-content (--z-overlay: 10) and the
+   pill bar (50). Using 9999 instead of --z-modal (1000) as belt-and-braces. */
+.site-nav {
+  background: var(--gl-navy) !important;
+  z-index: 9999 !important;
 }
 
 .projects-header.is-scrolled {
