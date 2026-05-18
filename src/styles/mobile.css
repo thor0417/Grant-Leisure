@@ -487,10 +487,10 @@
   }
 
   .category-nav {
-    flex-wrap: wrap; /* Allows Heritage to wrap under Resorts on 2nd row */
-    overflow-x: hidden;
-    gap: 6px;
-    justify-content: flex-start; /* Heritage sits under Resorts, not pushed right */
+    flex-wrap: nowrap; /* All 5 pills on one row, never wrap */
+    overflow-x: hidden; /* Prevents horizontal page scroll if a pill clips */
+    gap: 6px; /* Tighter than desktop --space-xs to fit 5 pills at 360px */
+    justify-content: space-between;
   }
 
   .category-pill {
@@ -526,17 +526,15 @@
   /* ----------------------------------------------------------------------
      CINEMATIC ROWS  unified card layout on mobile.
 
-     Every project (cinematic and editorial) renders as the same card:
+     Every cinematic project renders as the same card as editorial:
      image on top (260px), then location/title/teaser/trigger below,
      then brief panel expanding underneath when triggered.
 
      Selectors use compound form (article.project-row-cinematic) which
      gives specificity (0,1,1)  beats projects.css single-class
-     selectors (0,1,0) without needing !important. No cascade fight,
-     no repaint pressure on the rest of the page.
+     selectors (0,1,0) without needing !important.
      ---------------------------------------------------------------------- */
 
-  /* Article: unwind absolute positioning, allow natural block flow */
   article.project-row-cinematic {
     aspect-ratio: unset;
     height: auto;
@@ -546,7 +544,6 @@
     display: block;
   }
 
-  /* Image: was absolute fill of a 480px frame; now a real 260px block */
   article.project-row-cinematic .cinematic-image-wrap {
     position: static;
     inset: auto;
@@ -562,13 +559,10 @@
     object-position: center center;
   }
 
-  /* Kill the gradient scrim  text sits below the image now, no need to
-     darken the bottom of the image. */
   article.project-row-cinematic .cinematic-image-wrap::after {
     display: none;
   }
 
-  /* Content: was absolute overlay; now a block below the image */
   article.project-row-cinematic .cinematic-content {
     position: static;
     inset: auto;
@@ -582,8 +576,6 @@
     background: var(--gl-white);
   }
 
-  /* Location: was a green pill on the image; now reads as green text
-     on white below the image, matching editorial .project-location */
   article.project-row-cinematic .cinematic-location {
     display: block;
     background: transparent;
@@ -597,7 +589,6 @@
     width: fit-content;
   }
 
-  /* Title: was white-on-image; now navy on white */
   article.project-row-cinematic .cinematic-title {
     color: var(--gl-navy);
     text-shadow: none;
@@ -605,7 +596,6 @@
     margin-bottom: var(--space-md);
   }
 
-  /* Teaser: was white-on-image with shadow; now navy at 75% opacity */
   article.project-row-cinematic .cinematic-teaser {
     color: var(--gl-navy);
     opacity: 0.75;
@@ -615,25 +605,21 @@
     margin-bottom: var(--space-lg);
   }
 
-  /* Trigger: was white text; now green text */
   article.project-row-cinematic .cinematic-trigger {
     color: var(--gl-green);
   }
 
-  /* Panel: was a positioned sibling; now flows naturally below content */
   article.project-row-cinematic .cinematic-panel {
     position: static;
     width: 100%;
   }
 
   /* ----------------------------------------------------------------------
-     EDITORIAL ROWS  fixed image height, image-top text-below.
+     EDITORIAL ROWS  fixed image height, full width on mobile.
 
-     Compound selector article.project-row gives specificity (0,1,1) to
-     beat projects.css single-class .project-image-block (0,1,0) without
-     !important. Without this, projects.css aspect-ratio: 4/3 (line 119)
-     wins the cascade and the image renders at natural proportions
-     instead of the intended 260px frame.
+     Compound selector article.project-row .project-image-block (0,1,1)
+     beats projects.css .project-image-block (0,1,0) so we can override
+     aspect-ratio: 4/3 without !important.
      ---------------------------------------------------------------------- */
 
   article.project-row .project-image-block {
@@ -658,8 +644,6 @@
     padding: 2rem 1.25rem;
   }
 
-  /* Reversed rows: desktop order rules live inside @media (min-width: 768px)
-     so they cannot leak to phone. Reset is belt-and-braces. */
   article.project-row.is-reversed .project-image-block,
   article.project-row.is-reversed .project-text-block,
   article.project-row.is-reversed .project-panel {
