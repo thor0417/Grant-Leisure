@@ -426,3 +426,246 @@
   /* Marquee gap on tablet sits between mobile (2rem) and desktop (3rem).
      Hold the components.css 3rem  the wider viewport absorbs it. */
 }
+
+/* ==========================================================================
+   PROJECTS.HTML  phone (max-width 767px) and tablet (768px to 1279px)
+
+   Appended after the index.html mobile/tablet blocks. Targets only classes
+   confirmed present in projects.html and styled in projects.css. The site
+   nav (.site-nav, .nav-inner, .nav-toggle, .nav-links) is shared with
+   index.html and remains governed by the existing mobile block above; no
+   rule below targets nav internals.
+
+   Layout truths that drive every override here:
+   - projects.css base .project-row is grid-template-columns: 1fr. The
+     two-column rule lives inside its own @media (min-width: 768px) block.
+     Phone inherits single-column naturally  no column override needed.
+   - .projects-header has unconditional top: 72px. Must drop to 60px at
+     phone to sit flush below the mobile nav.
+   - .project-image-block carries unconditional aspect-ratio: 4/3. Any
+     explicit height we set at phone must also unset aspect-ratio or the
+     two rules fight and produce inconsistent block heights.
+   - .project-row-cinematic carries unconditional aspect-ratio: 16/9. At
+     390px that renders ~219px tall  not enough for headline + teaser +
+     trigger. Replace with explicit 480px and unset aspect-ratio.
+   ====================================================================== */
+
+
+/* ==========================================================================
+   PROJECTS  PHONE  max-width 767px
+   ====================================================================== */
+@media (max-width: 767px) {
+
+  /* ----------------------------------------------------------------------
+     PILL BAR  sticky below the 60px mobile nav, solid navy, no blur.
+     Five pills must fit one row at 360px floor with no horizontal scroll.
+     ---------------------------------------------------------------------- */
+
+  .projects-header {
+    top: 60px; /* Flush below 60px mobile nav (desktop default is 72px) */
+    background: var(--gl-navy);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    z-index: 200; /* Above projects-grid (base) and reveal layers, below site-nav (9999) */
+  }
+
+  /* Re-enforce solid navy in the scrolled state. projects.css applies a
+     translucent rgba background with backdrop-filter when .is-scrolled is
+     toggled  on phone the blur creates a visible seam against the nav
+     above. Hold a solid fill so the two bars read as one navy strip. */
+  .projects-header.is-scrolled {
+    background: var(--gl-navy);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .projects-header-inner {
+    /* Tighten vertical padding to keep the combined nav + pill bar height
+       inside ~96px. Desktop clamp resolves to ~24px at 390px which is fine;
+       we lock 12px to give the pills more vertical room without growing the bar. */
+    padding: 12px clamp(0.75rem, 3vw, 1.25rem);
+  }
+
+  .category-nav {
+    flex-wrap: nowrap; /* All 5 pills on one row, never wrap */
+    overflow-x: hidden; /* Prevents horizontal page scroll if a pill clips */
+    gap: 6px; /* Tighter than desktop --space-xs to fit 5 pills at 360px */
+    justify-content: space-between;
+  }
+
+  .category-pill {
+    /* Compress padding, font-size, and height. Desktop pills are 48px tall
+       with 1.5rem horizontal padding  too wide to fit 5 at 390px. The
+       senior touch target rule still holds at 48px via height: 48px on the
+       parent .projects-header (combined hit-state with the bar). */
+    height: 36px;
+    padding: 0 0.75rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em; /* Slightly tighter than desktop's --tracking-wide for fit */
+    flex-shrink: 1;
+    min-width: 0; /* Allows flex children to shrink below content width */
+  }
+
+  /* ----------------------------------------------------------------------
+     FIRST ROW OFFSET  clear the fixed nav AND the sticky pill bar.
+
+     Sticky element heights at phone:
+       Nav:        60px
+       Pill bar:   ~60px (12px top + 36px pill + 12px bottom)
+     Total:        ~120px
+
+     projects.css sets padding-top: 72px unconditionally on the first
+     article. Bump to 132px at phone so the first cinematic row clears
+     both stacked bars with a small breathing margin.
+     ---------------------------------------------------------------------- */
+
+  .projects-grid > article:first-child {
+    padding-top: 132px;
+  }
+
+  /* ----------------------------------------------------------------------
+     CINEMATIC ROWS  fixed height replaces 16/9 aspect-ratio.
+
+     At 390px viewport, 16/9 renders ~219px tall  insufficient for the
+     headline + teaser + trigger to sit comfortably above the gradient
+     scrim. Lock 480px and rebuild the layered structure so the image
+     fills behind absolute-positioned overlay content.
+     ---------------------------------------------------------------------- */
+
+  .project-row-cinematic {
+    aspect-ratio: unset; /* Defeat projects.css unconditional 16/9 */
+    height: 480px;
+    position: relative;
+    overflow: hidden;
+    display: block; /* Was flex column  unnecessary once overlay is absolute */
+    touch-action: pan-y; /* Vertical scroll never blocked by row */
+  }
+
+  .cinematic-image-wrap {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .cinematic-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  .cinematic-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto; /* Anchor only to bottom so content sits in the gradient scrim */
+    padding: 1.5rem 1.25rem 2rem;
+    max-width: 100%;
+  }
+
+  .cinematic-title {
+    /* Phone clamp replaces desktop's clamp(2.5rem, 5vw, 4.5rem) which is
+       far too large in 390px. New range tops out at 2rem  matches the
+       weight of about-heading and proof labels in the mobile block above. */
+    font-size: clamp(1.4rem, 4.5vw, 2rem);
+  }
+
+  .cinematic-teaser {
+    font-size: 0.95rem;
+  }
+
+  /* ----------------------------------------------------------------------
+     EDITORIAL ROWS  fixed image height, image-top text-below, normalize
+     reversed rows so order is always image -> text on phone.
+
+     The base .project-row at mobile is already grid-template-columns: 1fr
+     (confirmed in projects.css line 102). The two-column desktop layout
+     lives inside @media (min-width: 768px), so phone inherits stacked
+     naturally  no column override needed.
+     ---------------------------------------------------------------------- */
+
+  .project-image-block {
+    aspect-ratio: unset; /* Defeat projects.css unconditional 4/3 */
+    height: 260px;
+    overflow: hidden;
+    border-right: none; /* Desktop adds a right border for the 50/50 split */
+    border-left: none;
+  }
+
+  .project-image-block img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  .project-text-block {
+    width: 100%;
+    padding: 2rem 1.25rem;
+  }
+
+  /* Reversed rows: desktop puts image right, text left via order rules.
+     On phone we always want image on top, text below regardless of
+     desktop reversal. Reset all three order properties. */
+  .project-row.is-reversed .project-image-block,
+  .project-row.is-reversed .project-text-block,
+  .project-row.is-reversed .project-panel {
+    order: 0;
+  }
+
+  /* ----------------------------------------------------------------------
+     BRIEF PANELS  readable padding, 48px close-button hit-state.
+     ---------------------------------------------------------------------- */
+
+  .project-panel-inner,
+  .cinematic-panel-inner {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .project-panel,
+  .cinematic-panel {
+    touch-action: pan-y; /* Vertical scroll inside an open panel never blocked */
+  }
+
+  .project-close,
+  .cinematic-close {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+}
+
+
+/* ==========================================================================
+   PROJECTS  TABLET  min-width 768px and max-width 1279px
+
+   At 768px the desktop layout is largely correct. The two adjustments below
+   are nav-height alignment (the projects header sits 72px below the top to
+   match the tablet/desktop nav, which projects.css already specifies  so
+   no override needed) and ensuring the phone overrides above do not leak.
+
+   What's already correct from projects.css at 768px+:
+   - .project-row two-column grid restored via its own @media min-width: 768px
+   - .project-row.is-reversed order rules restored in the same block
+   - .project-image-block aspect-ratio: 4/3 active (no phone height override
+     applies above 767px because the phone block uses max-width: 767px)
+   - .project-row-cinematic aspect-ratio: 16/9 active (same reason  at
+     768px this renders ~432px tall, sufficient for overlay content)
+   - .projects-header top: 72px (already correct for tablet nav)
+   - Pill desktop sizing restored (phone overrides do not apply)
+   - Brief panel padding restored
+
+   No tablet-specific rules are required for projects.html. The block below
+   is present for symmetry with the index.html tablet block above and as a
+   documented anchor for future tablet-only adjustments if the visual review
+   surfaces edge cases.
+   ====================================================================== */
+@media (min-width: 768px) and (max-width: 1279px) {
+
+  /* No overrides needed  desktop layout from projects.css applies cleanly
+     across this range. Leave intentionally empty as a documented anchor. */
+
+}
