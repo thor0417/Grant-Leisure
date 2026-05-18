@@ -487,10 +487,10 @@
   }
 
   .category-nav {
-    flex-wrap: nowrap; /* All 5 pills on one row, never wrap */
+    flex-wrap: wrap; /* Allows Heritage to wrap under Resorts on 2nd row */
     overflow-x: hidden; /* Prevents horizontal page scroll if a pill clips */
     gap: 6px; /* Tighter than desktop --space-xs to fit 5 pills at 360px */
-    justify-content: space-between;
+    justify-content: flex-start; /* Heritage sits under Resorts, not pushed right */
   }
 
   .category-pill {
