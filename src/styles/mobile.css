@@ -191,6 +191,8 @@
   .bento {
     position: relative;
     display: block;
+    overflow: hidden;
+    min-height: 320px;
     touch-action: pan-y;
   }
 
@@ -200,8 +202,6 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--duration-default) var(--ease-stellar);
-    border-left: none;
-    border-color: rgba(255, 255, 255, 0.12);
     height: auto;
   }
 
@@ -209,6 +209,18 @@
     opacity: 1;
     pointer-events: auto;
     position: relative;
+  }
+
+  /* Defuse GSAP reveal: the carousel structure changes scroll-trigger geometry,
+     leaving cards stuck at translateY(40px) which produces a large gap above
+     the bento. Force final position and let .is-active handle visibility. */
+  .bento__card.reveal-content {
+    opacity: 0;
+    transform: none;
+  }
+
+  .bento__card.reveal-content.is-active {
+    opacity: 1;
   }
 
   /* Bento controls -- sized to match team and testimonials carousels */
@@ -225,7 +237,7 @@
   .bento-arrow {
     background: none;
     border: none;
-    color: var(--gl-white);
+    color: var(--gl-green-vivid);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0;
@@ -234,16 +246,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.7;
+    transition: color var(--duration-fast) var(--ease-stellar);
   }
 
   .bento-arrow:hover {
-    opacity: 1;
+    color: var(--gl-white);
   }
 
+  /* Dots match .testimonials__dot spec from components.css exactly */
   .bento-dots {
     display: flex;
-    gap: 0.6rem;
+    gap: var(--space-sm);
     align-items: center;
   }
 
@@ -251,16 +264,15 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: var(--gl-white);
-    opacity: 0.3;
+    background-color: rgba(255, 255, 255, 0.30);
     border: none;
     padding: 0;
     cursor: pointer;
-    transition: opacity var(--duration-fast) var(--ease-stellar);
+    transition: background-color var(--duration-fast) var(--ease-stellar);
   }
 
   .bento-dot.is-active {
-    opacity: 1;
+    background-color: var(--gl-green);
   }
 
 
