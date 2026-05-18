@@ -94,6 +94,21 @@
      HERO  headline scaled for 390px viewport, video untouched
      ====================================================================== */
 
+  /* Hero overlay's top-of-gradient navy darkening (rgba(50,62,72,0.35) at 0%)
+     creates the visible "strip" in the nav zone on mobile. On scroll, that
+     35% darkening stacks with the frosted nav's 75% navy and exaggerates the
+     contrast against the hero below. Start the gradient transparent at the
+     top so the nav zone reads as pure hero video. Keep the bottom anchor for
+     headline contrast. */
+  .hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(50, 62, 72, 0) 0%,
+      rgba(50, 62, 72, 0) 40%,
+      rgba(26, 26, 26, 0.60) 100%
+    );
+  }
+
   .hero-headline {
     /* Tighter clamp than desktop floor (3.25rem). Two-line wrap stays clean
        at 360px without horizontal scroll. */
