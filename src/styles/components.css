@@ -1093,7 +1093,26 @@
 }
 
 .team-card--keith .team-card__img-wrap img {
-  object-position: center 30%;
+  object-position: center 40%;
+}
+
+/* Per-card crop calibration. Default is `center top` (0%); higher % pushes
+   the crop downward, lower % keeps the head near the top of the frame.
+   Starting values from live review -- adjust in 5% increments. */
+.team-card--robert .team-card__img-wrap img {
+  object-position: center 15%;
+}
+
+.team-card--andy .team-card__img-wrap img {
+  object-position: center 35%;
+}
+
+.team-card--andrew .team-card__img-wrap img {
+  object-position: center 25%;
+}
+
+.team-card--edmund .team-card__img-wrap img {
+  object-position: center 25%;
 }
 
 .team-card:hover .team-card__img-wrap img {
