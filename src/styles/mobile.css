@@ -524,109 +524,57 @@
   }
 
   /* ----------------------------------------------------------------------
-     CINEMATIC ROWS  unstacked on mobile.
+     CINEMATIC ROWS  fixed height replaces 16/9 aspect-ratio.
 
-     Desktop cinematics overlay text on a full-bleed image using absolute
-     positioning. On mobile we want the same content stacked vertically
-     just like editorial rows: image on top, then location, title, teaser,
-     trigger, then the brief panel expanding below.
-
-     The HTML structure is already compatible  cinematic and editorial
-     articles have the same 3-child order (image-wrap, content, panel).
-     The only thing making cinematics LOOK different is absolute
-     positioning. Strip the absolutes, give the image a 260px frame,
-     and the content stacks naturally underneath.
-
-     Intentionally minimal. No background overrides, no padding overrides,
-     no color or text-shadow overrides. Anything not touched here keeps
-     whatever projects.css gave it.
+     At 390px viewport, 16/9 renders ~219px tall  insufficient for the
+     headline + teaser + trigger to sit comfortably above the gradient
+     scrim. Lock 480px and rebuild the layered structure so the image
+     fills behind absolute-positioned overlay content.
      ---------------------------------------------------------------------- */
 
-  /* Article: unwind absolute positioning, allow natural block flow */
   .project-row-cinematic {
-    aspect-ratio: unset !important;
-    height: auto !important;
-    min-height: 0 !important;
-    position: static !important;
-    overflow: visible !important;
-    display: block !important;
+    aspect-ratio: unset; /* Defeat projects.css unconditional 16/9 */
+    height: 480px;
+    position: relative;
+    overflow: hidden;
+    display: block; /* Was flex column  unnecessary once overlay is absolute */
+    touch-action: pan-y; /* Vertical scroll never blocked by row */
   }
 
-  /* Image: was absolute fill of a 480px frame; now a real 260px block */
   .cinematic-image-wrap {
-    position: static !important;
-    inset: auto !important;
-    width: 100% !important;
-    height: 260px !important;
-    overflow: hidden !important;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
 
   .cinematic-image-wrap img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     object-position: center center;
   }
 
-  /* Content: was absolute overlay; now a normal block below the image. */
   .cinematic-content {
-    position: static !important;
-    inset: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    top: auto !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 2rem 1.25rem !important;
-    background: var(--gl-white) !important;
-  }
-
-  /* Panel: was a positioned sibling; now flows naturally below content */
-  .cinematic-panel {
-    position: static !important;
-    width: 100% !important;
-  }
-
-  /* ----------------------------------------------------------------------
-     CINEMATIC VISUAL STYLING  match editorial appearance below the image.
-     ---------------------------------------------------------------------- */
-
-  .cinematic-location {
-    display: block !important;
-    background: transparent !important;
-    color: var(--gl-green) !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
-    margin-bottom: var(--space-xs) !important;
-    font-size: var(--text-sm) !important;
-    letter-spacing: var(--tracking-widest) !important;
-    text-transform: uppercase !important;
-    width: fit-content !important;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto; /* Anchor only to bottom so content sits in the gradient scrim */
+    padding: 1.5rem 1.25rem 2rem;
+    max-width: 100%;
   }
 
   .cinematic-title {
-    color: var(--gl-navy) !important;
-    text-shadow: none !important;
-    font-size: clamp(1.5rem, 6vw, 2rem) !important;
-    margin-bottom: var(--space-md) !important;
+    /* Phone clamp replaces desktop's clamp(2.5rem, 5vw, 4.5rem) which is
+       far too large in 390px. New range tops out at 2rem  matches the
+       weight of about-heading and proof labels in the mobile block above. */
+    font-size: clamp(1.4rem, 4.5vw, 2rem);
   }
 
   .cinematic-teaser {
-    color: var(--gl-navy) !important;
-    opacity: 0.75 !important;
-    text-shadow: none !important;
-    font-size: var(--text-body) !important;
-    line-height: var(--leading-loose) !important;
-    margin-bottom: var(--space-lg) !important;
-  }
-
-  .cinematic-trigger {
-    color: var(--gl-green) !important;
-  }
-
-  .cinematic-image-wrap::after {
-    display: none !important;
+    font-size: 0.95rem;
   }
 
   /* ----------------------------------------------------------------------
@@ -640,26 +588,22 @@
      ---------------------------------------------------------------------- */
 
   .project-image-block {
-    aspect-ratio: unset !important; /* Defeat projects.css unconditional 4/3 */
-    width: 100% !important; /* Force full width  defeats any 50% grid leak */
-    height: 260px !important;
-    grid-column: 1 / -1 !important; /* Span full grid in case 2-col rule leaks */
+    aspect-ratio: unset; /* Defeat projects.css unconditional 4/3 */
+    height: 260px;
     overflow: hidden;
-    border-right: none;
+    border-right: none; /* Desktop adds a right border for the 50/50 split */
     border-left: none;
   }
 
   .project-image-block img {
-    width: 100% !important;
-    height: 100% !important;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: center center;
-    display: block;
   }
 
   .project-text-block {
-    width: 100% !important;
-    grid-column: 1 / -1 !important;
+    width: 100%;
     padding: 2rem 1.25rem;
   }
 
