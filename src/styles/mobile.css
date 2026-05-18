@@ -39,6 +39,15 @@
 @media (max-width: 767px) {
 
   /* ======================================================================
+     PAGE SHELL  prevent any background bleed above the transparent nav
+     before the hero video paints
+     ====================================================================== */
+
+  body {
+    background: transparent;
+  }
+
+  /* ======================================================================
      NAV  60px height. Ghost nav from components.css applies unchanged.
      ====================================================================== */
 
@@ -172,9 +181,9 @@
     position: relative;
     display: block; /* break the grid context inherited from components.css */
     touch-action: pan-y;
-    /* Reserve vertical space so the absolutely positioned card has room.
-       Min-height tuned to the longest service copy at 390px width. */
-    min-height: 320px;
+    /* Fixed height locks the container so card swaps never reflow.
+       Tuned to the longest service copy at 390px width. */
+    height: 420px;
   }
 
   .bento__card {
@@ -189,15 +198,6 @@
     opacity: 1;
     pointer-events: auto;
     position: relative; /* active card drives the container height naturally */
-  }
-
-  .bento-controls {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
   }
 
 
@@ -224,7 +224,7 @@
   .team-card__img-wrap {
     /* Override aspect-ratio square at mobile so we can lock a fixed height. */
     aspect-ratio: auto;
-    height: 280px;
+    height: 380px;
   }
 
   .team-card__img-wrap img {
