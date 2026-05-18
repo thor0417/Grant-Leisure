@@ -43,18 +43,18 @@
      before the hero video paints
      ====================================================================== */
 
-  /* Hero owns its own background so the area behind the transparent nav is
-     filled before the video paints. Eliminates the navy strip above the nav. */
-  #hero {
+  /* Triple-layer navy backstop. iOS Safari and Brave Mobile expose different
+     background layers depending on dynamic-viewport state. Setting html, body,
+     and #hero all navy ensures whichever layer the browser exposes through
+     the chrome zone is filled. All white sections (#about, #validation,
+     #leadership, #engage) own explicit white backgrounds in components.css
+     so the body navy doesn't leak into them. */
+  html,
+  body {
     background-color: var(--gl-navy);
   }
 
-  /* html navy backstop. On mobile browsers, 100svh excludes the area covered
-     by visible browser chrome. The hero (height: 100svh) doesn't reach the
-     very top of the visual viewport, leaving a strip where neither hero nor
-     nav paints. html navy fills that strip cleanly. Body stays white from
-     global.css so sections relying on white scaffolding are unaffected. */
-  html {
+  #hero {
     background-color: var(--gl-navy);
   }
 
