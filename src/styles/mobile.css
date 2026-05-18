@@ -524,48 +524,49 @@
   }
 
   /* ----------------------------------------------------------------------
-     CINEMATIC ROWS  short landscape frame + panel flows below.
+     CINEMATIC ROWS  render as editorial cards on mobile.
 
-     Two problems being solved here:
+     Desktop has two row patterns: editorial (image + text side-by-side)
+     and cinematic (full-bleed image with overlay text). On mobile,
+     screen real estate kills the cinematic concept  overlay text fights
+     the image, the 480px landscape frame crops subjects aggressively,
+     and the brief drop-down gets trapped inside the framed article.
 
-     (1) Brief drop-down was invisible. The article was locked at
-         height: 480px with overflow: hidden, and the panel was a child
-         of the article. When the panel opened, it expanded inside the
-         clipped frame and the user never saw it. Fix: use min-height
-         on the article (not height), overflow: visible, move the
-         480px height onto .cinematic-image-wrap as the IMAGE frame
-         (not the article frame). The panel then flows in normal block
-         order below the image-wrap.
+     Solution: force cinematics to render as editorials on phone. Every
+     project becomes the same card pattern:
 
-     (2) Cinematic images cropped aggressively. The 480px-tall frame on
-         a 390px-wide phone is portrait-shaped, but the source images
-         are 1440x800 landscape (1.8:1). object-fit: cover then crops
-         the sides hard, cutting off subjects (Luxor sphinx, Stonehenge
-         stones). Fix: drop the frame to 260px tall so it matches the
-         editorial row height (which the user confirmed renders well)
-         and approximates the source image aspect ratio. The frame
-         becomes ~390x260 (1.5:1)  much closer to the source 1.8:1.
+       [ image, full width, 260px tall ]
+       [ green location label ]
+       [ project title ]
+       [ teaser, 2-3 lines ]
+       [ Read the Brief trigger ]
+       [ brief panel expands here when opened ]
+
+     The HTML stays exactly as is. We just override the cinematic-specific
+     positioning so the article reads as a vertical stack of blocks.
+     Drop-down works identically to editorial because the structure is now
+     identical.
      ---------------------------------------------------------------------- */
 
+  /* Article: vertical stack, grows naturally with content */
   .project-row-cinematic {
-    aspect-ratio: unset; /* Defeat projects.css unconditional 16/9 */
-    min-height: 260px; /* Was height: 480px  blocked the panel from showing */
-    height: auto; /* Article grows when panel opens */
-    position: relative;
-    overflow: visible; /* CRITICAL: was hidden  trapped the open panel */
+    aspect-ratio: unset; /* Defeat projects.css line 250 (16/9) */
+    height: auto;
+    min-height: 0;
+    position: static; /* Defeat desktop relative positioning */
+    overflow: visible;
     display: block;
-    touch-action: pan-y;
+    background: var(--gl-white); /* Card background matches editorial */
+    border-bottom: 1px solid rgba(50, 62, 72, 0.12); /* Match .project-row border */
   }
 
-  /* The image lives in its own 260px frame. position: relative (not
-     absolute) means it occupies real space and pushes the panel below it
-     in normal block flow. */
+  /* Image: full width, 260px tall  matches editorial .project-image-block */
   .cinematic-image-wrap {
-    position: relative; /* Was absolute  panel could not flow below */
-    inset: auto; /* Defeat any inherited inset from desktop */
+    position: static;
+    inset: auto;
     width: 100%;
-    height: 260px; /* Was 100% of a 480px parent  now the explicit frame */
-    overflow: hidden; /* Image crop happens here, not on the article */
+    height: 260px;
+    overflow: hidden;
   }
 
   .cinematic-image-wrap img {
@@ -575,44 +576,73 @@
     object-position: center center;
   }
 
-  /* Content overlay sits absolute inside the image-wrap (the 260px frame),
-     anchored to its bottom edge in the gradient scrim. Because image-wrap
-     now occupies real layout space, the overlay rides with it. */
+  /* Kill the gradient scrim on mobile  text now sits below the image,
+     not on top of it, so the scrim is unnecessary and creates a muddy
+     bottom edge on the image. */
+  .cinematic-image-wrap::after {
+    display: none;
+  }
+
+  /* Content: was absolute-positioned overlay; now a normal block below
+     the image. Padding matches editorial .project-text-block. */
   .cinematic-content {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: auto;
-    z-index: 2;
-    padding: 1rem 1.25rem 1.25rem; /* Tighter for 260px frame */
-    max-width: 100%;
-  }
-
-  /* The panel was a sibling of image-wrap in the article. With image-wrap
-     now position: relative occupying 260px and overflow: visible on the
-     article, the panel flows naturally below the image in block order.
-     No positioning override needed  just ensure it spans full width. */
-  .cinematic-panel {
+    position: static;
+    inset: auto;
     width: 100%;
+    max-width: 100%;
+    padding: 2rem 1.25rem;
+    background: var(--gl-white);
+    z-index: auto;
   }
 
+  /* Location label: was a green pill on the image; now reads as the
+     uppercase green location line that editorial rows use. Strip the
+     pill background, padding, and rounded corners. */
+  .cinematic-location {
+    display: block;
+    background: transparent;
+    color: var(--gl-green); /* Was white-on-green pill */
+    padding: 0;
+    border-radius: 0;
+    margin-bottom: var(--space-xs);
+    /* Match .project-location: caps, tracked, small */
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+  }
+
+  /* Title: dark navy on white now (was white on image). Drop the text
+     shadow that was carrying it against the image background. */
   .cinematic-title {
-    /* Phone clamp replaces desktop's clamp(2.5rem, 5vw, 4.5rem) which is
-       far too large in 390px. Tightened further for the 260px frame so
-       title + teaser + trigger fit within the gradient scrim. */
-    font-size: clamp(1.25rem, 4.5vw, 1.75rem);
+    color: var(--gl-navy);
+    text-shadow: none;
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    margin-bottom: var(--space-md);
   }
 
+  /* Teaser: dark on white now. Drop the text shadow and white opacity. */
   .cinematic-teaser {
-    font-size: 0.9rem;
-    /* Teaser sits in the gradient scrim with the title. At 260px frame
-       height, anything taller than ~2 lines pushes the title out of the
-       scrim into the bright image area. Limit to 2 lines with ellipsis. */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    color: var(--gl-navy);
+    opacity: 0.75; /* Match .project-teaser */
+    text-shadow: none;
+    font-size: var(--text-body);
+    line-height: var(--leading-loose);
+    margin-bottom: var(--space-lg);
+    /* No line-clamp  let it run natural like editorial teasers */
+  }
+
+  /* Trigger: green on white now (was white on image) */
+  .cinematic-trigger {
+    color: var(--gl-green);
+  }
+
+  /* Panel: was a position: relative sibling that could get trapped.
+     Make it a clean block under the content, full width, no special
+     positioning. Identical to .project-panel behavior. */
+  .cinematic-panel {
+    position: static;
+    width: 100%;
+    z-index: auto;
   }
 
   /* ----------------------------------------------------------------------
