@@ -39,20 +39,8 @@
 @media (max-width: 767px) {
 
   /* ======================================================================
-     NAV  solid navy, no glass, fixed 60px height
+     NAV  60px height. Ghost nav from components.css applies unchanged.
      ====================================================================== */
-
-  /* Both default and scrolled states forced solid; matching specificity
-     against components.css .site-nav.is-scrolled rule (0,0,2,0). */
-  .site-nav,
-  .site-nav.is-scrolled {
-    background: var(--gl-navy);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    box-shadow: none;
-    transition: none;
-    z-index: 9999; /* Above cinematic overlays on projects.html and any in-flow content */
-  }
 
   .nav-inner {
     height: 60px;
@@ -203,6 +191,15 @@
     position: relative; /* active card drives the container height naturally */
   }
 
+  .bento-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
 
   /* ======================================================================
      VALIDATION / MARQUEE
@@ -211,7 +208,7 @@
      ====================================================================== */
 
   .marquee__track {
-    gap: 2rem;
+    gap: 1.5rem;
     align-items: center;
   }
 
