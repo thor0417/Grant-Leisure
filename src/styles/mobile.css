@@ -43,9 +43,10 @@
      before the hero video paints
      ====================================================================== */
 
-  html,
-  body {
-    background: var(--gl-navy); /* matches the nav colour so no strip is visible above hero */
+  /* Hero owns its own background so the area behind the transparent nav is
+     filled before the video paints. Eliminates the navy strip above the nav. */
+  #hero {
+    background-color: var(--gl-navy);
   }
 
   /* ======================================================================
@@ -204,13 +205,6 @@
     height: auto;
   }
 
-  .bento__card:hover,
-  .bento__card:active,
-  .bento__card:focus {
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: var(--shadow-md);
-  }
-
   .bento__card.is-active {
     opacity: 1;
     pointer-events: auto;
@@ -223,8 +217,9 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: var(--space-lg);
-    margin-top: var(--space-md);
+    gap: var(--space-xl);
+    margin-top: var(--space-lg);
+    padding-bottom: var(--space-lg);
   }
 
   .bento-arrow {
