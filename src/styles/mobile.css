@@ -593,22 +593,26 @@
      ---------------------------------------------------------------------- */
 
   .project-image-block {
-    aspect-ratio: unset; /* Defeat projects.css unconditional 4/3 */
-    height: 260px;
+    aspect-ratio: unset !important; /* Defeat projects.css unconditional 4/3 */
+    width: 100% !important; /* Force full width  defeats any 50% grid leak */
+    height: 260px !important;
+    grid-column: 1 / -1 !important; /* Span full grid in case 2-col rule leaks */
     overflow: hidden;
-    border-right: none; /* Desktop adds a right border for the 50/50 split */
+    border-right: none;
     border-left: none;
   }
 
   .project-image-block img {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
     object-fit: cover;
     object-position: center center;
+    display: block;
   }
 
   .project-text-block {
-    width: 100%;
+    width: 100% !important;
+    grid-column: 1 / -1 !important;
     padding: 2rem 1.25rem;
   }
 
