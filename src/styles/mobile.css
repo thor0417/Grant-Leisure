@@ -627,41 +627,42 @@
   }
 
   /* ----------------------------------------------------------------------
-     EDITORIAL ROWS  fixed image height, image-top text-below, normalize
-     reversed rows so order is always image -> text on phone.
+     EDITORIAL ROWS  fixed image height, image-top text-below.
 
-     The base .project-row at mobile is already grid-template-columns: 1fr
-     (confirmed in projects.css line 102). The two-column desktop layout
-     lives inside @media (min-width: 768px), so phone inherits stacked
-     naturally  no column override needed.
+     Compound selector article.project-row gives specificity (0,1,1) to
+     beat projects.css single-class .project-image-block (0,1,0) without
+     !important. Without this, projects.css aspect-ratio: 4/3 (line 119)
+     wins the cascade and the image renders at natural proportions
+     instead of the intended 260px frame.
      ---------------------------------------------------------------------- */
 
-  .project-image-block {
-    aspect-ratio: unset; /* Defeat projects.css unconditional 4/3 */
+  article.project-row .project-image-block {
+    aspect-ratio: unset;
+    width: 100%;
     height: 260px;
     overflow: hidden;
-    border-right: none; /* Desktop adds a right border for the 50/50 split */
+    border-right: none;
     border-left: none;
   }
 
-  .project-image-block img {
+  article.project-row .project-image-block img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center center;
+    display: block;
   }
 
-  .project-text-block {
+  article.project-row .project-text-block {
     width: 100%;
     padding: 2rem 1.25rem;
   }
 
-  /* Reversed rows: desktop puts image right, text left via order rules.
-     On phone we always want image on top, text below regardless of
-     desktop reversal. Reset all three order properties. */
-  .project-row.is-reversed .project-image-block,
-  .project-row.is-reversed .project-text-block,
-  .project-row.is-reversed .project-panel {
+  /* Reversed rows: desktop order rules live inside @media (min-width: 768px)
+     so they cannot leak to phone. Reset is belt-and-braces. */
+  article.project-row.is-reversed .project-image-block,
+  article.project-row.is-reversed .project-text-block,
+  article.project-row.is-reversed .project-panel {
     order: 0;
   }
 
