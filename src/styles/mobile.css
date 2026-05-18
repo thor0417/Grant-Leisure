@@ -83,10 +83,18 @@
     position: relative;
   }
 
-  /* Open menu panel must also sit above all content */
+  /* Open menu panel must also sit above all content. Force display: none when
+     closed so the panel does not paint as a navy strip at the top of the page.
+     components.css applies display: flex without a media query, which beats
+     global.css's mobile display: none. Re-enforce the hide here. */
   .nav-links {
+    display: none;
     z-index: 9999;
     top: 60px;
+  }
+
+  .nav-links.is-open {
+    display: flex;
   }
 
 
