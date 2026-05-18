@@ -77,13 +77,10 @@
     max-width: none !important; /* defeat global img max-width: 100% */
   }
 
-  /* Hamburger sits above all content including cinematic overlays.
-     margin-right pulls the button inward so the hamburger/X icon does
-     not clip against the screen edge on phones. */
+  /* Hamburger sits above all content including cinematic overlays */
   .nav-toggle {
     z-index: 9999;
     position: relative;
-    margin-right: 1rem;
   }
 
   /* Open menu panel must also sit above all content. Force display: none when
