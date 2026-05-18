@@ -178,6 +178,15 @@
      be added when that markup ships.
      ====================================================================== */
 
+  /* Tighten section padding and heading margin to match desktop visual ratio */
+  #expertise {
+    padding-block: var(--space-xl);
+  }
+
+  .expertise__heading {
+    margin-block-end: var(--space-md);
+  }
+
   .bento {
     position: relative;
     display: block;
