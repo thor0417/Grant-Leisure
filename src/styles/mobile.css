@@ -49,6 +49,15 @@
     background-color: var(--gl-navy);
   }
 
+  /* html navy backstop. On mobile browsers, 100svh excludes the area covered
+     by visible browser chrome. The hero (height: 100svh) doesn't reach the
+     very top of the visual viewport, leaving a strip where neither hero nor
+     nav paints. html navy fills that strip cleanly. Body stays white from
+     global.css so sections relying on white scaffolding are unaffected. */
+  html {
+    background-color: var(--gl-navy);
+  }
+
   /* ======================================================================
      NAV  60px height. Ghost nav from components.css applies unchanged.
      ====================================================================== */
@@ -193,8 +202,9 @@
     display: block;
     overflow: hidden;
     /* Fixed height so card swaps never resize the container.
-       Tuned to longest service copy at 390px width. */
-    height: 360px;
+       Tuned to fit the tallest card's natural content at 390px width
+       (3-line body + padding + button), matching desktop card ratio. */
+    height: 280px;
     touch-action: pan-y;
   }
 
