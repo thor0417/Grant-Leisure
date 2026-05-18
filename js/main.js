@@ -65,6 +65,7 @@ if (navToggle && navLinks) {
 const teamTrack = document.getElementById('team-carousel-track');
 const teamPrev = document.getElementById('team-prev');
 const teamNext = document.getElementById('team-next');
+const teamDots = document.getElementById('team-dots');
 
 if (teamTrack && teamPrev && teamNext) {
   const teamCards = teamTrack.querySelectorAll('.team-card');
@@ -78,12 +79,40 @@ if (teamTrack && teamPrev && teamNext) {
     return Math.max(0, teamCards.length - getTeamVisible());
   }
 
+  /* Builds one dot per valid index. Count differs between mobile (9 stops)
+     and desktop (7 stops), so this re-runs on resize. */
+  function renderTeamDots() {
+    if (!teamDots) return;
+    teamDots.innerHTML = '';
+    const stopCount = getTeamMax() + 1;
+    for (let i = 0; i < stopCount; i++) {
+      const dot = document.createElement('button');
+      dot.classList.add('team-carousel__dot');
+      dot.setAttribute('aria-label', 'Go to team slide ' + (i + 1));
+      if (i === teamIndex) dot.classList.add('is-active');
+      dot.addEventListener('click', function () {
+        teamIndex = i;
+        updateTeamCarousel();
+      });
+      teamDots.appendChild(dot);
+    }
+  }
+
+  function syncTeamDots() {
+    if (!teamDots) return;
+    const dots = teamDots.children;
+    for (let i = 0; i < dots.length; i++) {
+      dots[i].classList.toggle('is-active', i === teamIndex);
+    }
+  }
+
   function updateTeamCarousel() {
     const cardWidth = teamCards[0].offsetWidth + parseInt(getComputedStyle(teamTrack).gap || '0');
     teamTrack.style.transform = 'translateX(-' + (teamIndex * cardWidth) + 'px)';
     /* Arrows always enabled -- index wraps via modulo, no dead ends */
     teamPrev.disabled = false;
     teamNext.disabled = false;
+    syncTeamDots();
   }
 
   teamPrev.addEventListener('click', function () {
@@ -100,9 +129,11 @@ if (teamTrack && teamPrev && teamNext) {
 
   window.addEventListener('resize', function () {
     teamIndex = Math.min(teamIndex, getTeamMax());
+    renderTeamDots();
     updateTeamCarousel();
   });
 
+  renderTeamDots();
   updateTeamCarousel();
 }
 

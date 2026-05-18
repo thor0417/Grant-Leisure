@@ -992,6 +992,11 @@
 .marquee__item img[alt="Village Roadshow"]                 { transform: scale(0.85); } /* was 0.70 -- too small */
 .marquee__item img[alt="Universal"]                        { transform: scale(0.85); } /* was 0.75 -- too small */
 
+.marquee__item img[alt="NBC Universal"] {
+  opacity: 1;
+  filter: grayscale(0%) opacity(1);
+}
+
 .marquee__item img:hover {
   filter: grayscale(0%) opacity(1);
 }
@@ -1155,45 +1160,60 @@
 
 .team-carousel__controls {
   display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: center;
   gap: var(--space-md);
   margin-block-start: var(--space-lg);
 }
 
-.carousel-btn {
-  /* Stripped-back arrow -- no circle, no border. 48px target preserved. */
-  width: 48px;
-  height: 48px;
-  padding: 0;
+/* Dots between the arrows -- mirrors the testimonials pattern.
+   Team section sits on white, so dots use navy tones instead of white. */
+.team-carousel__dots {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.team-carousel__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(50, 62, 72, 0.25);
   border: none;
-  border-radius: 0;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-stellar);
+  padding: 0;
+  min-height: unset;
+}
+
+.team-carousel__dot.is-active {
+  background-color: var(--gl-green-vivid);
+}
+
+.carousel-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--gl-green-vivid);
   background: none;
-  color: var(--gl-navy); /* Default surface; testimonials override below for navy bg */
-  font-size: 1.75rem;
-  line-height: 1;
+  color: var(--gl-green-vivid);
+  font-size: 1.25rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color var(--duration-fast) var(--ease-stellar);
+  transition: background-color var(--duration-fast) var(--ease-stellar),
+              color var(--duration-fast) var(--ease-stellar);
 }
 
 .carousel-btn:hover {
-  color: var(--gl-green-vivid);
-}
-
-.carousel-btn:focus-visible {
-  outline: 2px solid var(--gl-green-vivid);
-  outline-offset: 4px;
-}
-
-/* Testimonials sit on navy -- arrows need light contrast */
-#testimonials .carousel-btn {
+  background-color: var(--gl-green);
   color: var(--gl-white);
 }
 
-#testimonials .carousel-btn:hover {
-  color: var(--gl-green-vivid);
+.carousel-btn:focus-visible {
+  outline: 3px solid var(--gl-green);
+  outline-offset: 3px;
 }
 
 /* ============================================================
