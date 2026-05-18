@@ -476,69 +476,46 @@
 @media (max-width: 767px) {
 
   /* ----------------------------------------------------------------------
-     PILL BAR  sticky below the 60px mobile nav, solid navy, no blur.
-     Two-row layout: Attractions / Resorts / Zoological on row 1,
-     Museums / Heritage left-aligned on row 2.
+     PILL BAR  scrolls with the page on mobile (NOT sticky).
+
+     The previous attempt set position: sticky with top: 60px to pin the
+     bar below the 60px ghost nav. That created a two-sticky-element
+     collision  the site-nav and the pill bar both fought for the top
+     of viewport and the nav slid out of view on scroll. The working
+     state before was: nav scrolls with the page, pill bar scrolls with
+     the page, no sticky positioning at all on mobile.
+
+     Restore that. Defeat projects.css line 9-12 (position: sticky;
+     top: 72px) with position: static at phone width.
+
+     Only the pill layout (Heritage under Resorts) is kept from the
+     previous attempt.
      ---------------------------------------------------------------------- */
 
   .projects-header {
-    top: 60px !important; /* Defeat projects.css line 11 (top: 72px) */
-    background: var(--gl-navy) !important; /* Defeat projects.css line 8 */
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    z-index: 200; /* Above projects-grid, below site-nav (9999) */
-  }
-
-  /* projects.css line 18 applies rgba background + backdrop-filter when
-     .is-scrolled is toggled. On phone the blur creates a visible seam
-     against the solid navy nav above. Force solid fill so the two bars
-     read as one continuous navy strip. */
-  .projects-header.is-scrolled {
-    background: var(--gl-navy) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  .projects-header-inner {
-    /* Defeat projects.css line 34 clamp padding. Tighter vertical so the
-       2-row pill stack stays inside ~120px combined height. */
-    padding: 12px clamp(0.75rem, 3vw, 1.25rem) !important;
+    position: static !important; /* Defeat projects.css line 9 sticky */
+    top: auto !important; /* Defeat projects.css line 11 */
   }
 
   /* Pills wrap onto 2 rows. flex-start (not space-between) places Heritage
-     directly under Resorts instead of leaving an awkward gap with Heritage
-     pushed to the right. */
+     directly under Resorts instead of leaving an awkward gap. This is the
+     only pill-layout change that survives from the previous attempt. */
   .category-nav {
     flex-wrap: wrap !important;
-    gap: 8px 10px !important; /* row-gap col-gap; tighter than desktop --space-xs */
+    gap: 8px 10px !important;
     justify-content: flex-start !important;
   }
 
-  /* Compressed pill sizing. Desktop is height: 48px / padding: 0 1.5rem,
-     too wide for 3-up at 390px. Senior touch target is preserved by the
-     surrounding pill bar's combined hit zone (~60px tall stripe). */
-  .category-pill {
-    height: 40px !important; /* Defeat projects.css line 54 */
-    padding: 0 1rem !important; /* Defeat projects.css line 53 */
-    font-size: 0.72rem;
-    letter-spacing: 0.04em;
-  }
+  /* No pill sizing override  desktop sizing (48px tall, padding 0 1.5rem)
+     works fine since pills wrap onto 2 rows. The earlier 36px / 40px
+     compressed sizing was needed for the abandoned 5-in-a-row attempt.
+     Leaving it out also restores the senior 48px touch target. */
 
-  /* ----------------------------------------------------------------------
-     FIRST ROW OFFSET  clear nav + 2-row pill bar.
-
-     Combined sticky height at phone:
-       Nav:                              60px
-       Pill bar (12 + 40 + 8 + 40 + 12): 112px
-     Total:                              172px
-
-     Add 20px breathing margin = 192px. Defeats projects.css line 82
-     (padding-top: 72px).
-     ---------------------------------------------------------------------- */
-
-  .projects-grid > article:first-child {
-    padding-top: 192px !important;
-  }
+  /* No first-row padding-top override needed. Without the sticky pill bar
+     there's no fixed-element height to clear  the first article sits
+     naturally below the pill bar in normal document flow. The
+     projects.css line 82 (padding-top: 72px) still applies, which is
+     correct: that clears the site-nav and matches desktop behavior. */
 
   /* ----------------------------------------------------------------------
      CINEMATIC ROWS  CRITICAL FIX: panel must be able to expand BELOW
