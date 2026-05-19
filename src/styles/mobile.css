@@ -68,12 +68,24 @@
      ScrollTrigger pre-refresh state, or layout shift from late-loading
      images) was establishing a containing block wider than the viewport
      for the position: fixed header. width: 100vw + right: auto forces
-     viewport-relative sizing so the hamburger never clips off the right edge. */
-  .site-nav {
-    width: 100vw;
-    max-width: 100vw;
+     viewport-relative sizing so the hamburger never clips off the right edge.
+
+     Position is locked to fixed top: 0 in both default and scrolled states.
+     On projects.html, when .is-scrolled is added during scroll, something
+     (likely mobile browser address-bar viewport shift or a transition timing
+     quirk) was producing a vertical gap above the nav. Forcing top: 0 with
+     !important defeats any computed offset and keeps the nav glued to the
+     top of the viewport across all scroll states. */
+  .site-nav,
+  .site-nav.is-scrolled {
+    position: fixed !important; /* defeat any inherited / overridden positioning during scroll */
+    top: 0 !important;           /* defeat any computed top offset during scroll */
     left: 0;
     right: auto;
+    width: 100vw;
+    max-width: 100vw;
+    margin: 0;                   /* defeat any margin that could push the nav down */
+    transform: none;             /* defeat any inherited transform from animation/reveal */
   }
 
   .nav-inner {
