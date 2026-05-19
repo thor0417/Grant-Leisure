@@ -62,19 +62,6 @@
      NAV  60px height. Ghost nav from components.css applies unchanged.
      ====================================================================== */
 
-  /* Pin nav to viewport width. On projects.html mobile the nav intermittently
-     measured 586px wide on a 522px viewport, clipping the hamburger off the
-     right edge. width: 100vw + right: auto forces viewport-relative sizing
-     regardless of containing block calculations. No !important, no position
-     override -- the rest of the nav (position: fixed, top: 0) comes from
-     global.css and components.css and is correct as-is. */
-  .site-nav {
-    width: 100vw;
-    max-width: 100vw;
-    left: 0;
-    right: auto;
-  }
-
   .nav-inner {
     height: 60px;
   }
