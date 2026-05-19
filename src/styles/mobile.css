@@ -110,6 +110,17 @@
     display: flex;
   }
 
+  /* When the hamburger menu is open on mobile, force the nav to solid navy
+     so the nav + open menu read as one continuous navy block. Without this,
+     on index.html (where the nav background is transparent at scroll=0 over
+     the hero video) the open menu sits flush below a still-transparent nav,
+     leaving a visible video-leak strip across the nav row. Projects nav is
+     already solid navy by default, but applying the rule here unifies both
+     pages' open-menu appearance. */
+  .site-nav:has(.nav-links.is-open) {
+    background: var(--gl-navy);
+  }
+
 
   /* ======================================================================
      HERO  headline scaled for 390px viewport, video untouched
