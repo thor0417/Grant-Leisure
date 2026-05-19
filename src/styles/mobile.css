@@ -1,724 +1,460 @@
-/* ==========================================================================
-   MOBILE.CSS  Grant Leisure "Visible Dominance" v2
-   Scope: phone (max-width 767px) and tablet (768px to 1279px) overrides for
-   index.html. Loads unconditionally after components.css. All overrides live
-   inside @media blocks below; nothing in this file applies at desktop width.
-
-   Locked components left untouched (no rules target their internals):
-     services bento carousel JS state,
-     team carousel JS state,
-     testimonials carousel JS state,
-     touch swipe JS on all three.
-
-   Flagged for the project owner:
-   1. Bento mobile carousel
-      Brief specifies .bento__card.is-active single-card carousel with arrow
-      and dot controls on mobile. components.css has no .is-active rule for
-      bento cards. index.html has no arrow or dot markup inside #expertise.
-      This file provides the container, absolute positioning, and is-active
-      reveal rule per brief, but no rules target non-existent control elements.
-      Carousel will activate only when JS toggles is-active on .bento__card
-      and matching control markup is added.
-
-   2. Projects pill bar
-      Brief calls for a sticky pill bar below the 60px nav. No such markup
-      exists in index.html (the bar lives in projects.html). Skipped.
-      Project-page styles belong in projects.css, not here.
-
-   3. Cinematic overlay rows
-      Desktop nav z-index is var(--z-modal) to clear projects.html cinematic
-      overlays. Mobile keeps the nav at the highest practical z-index for
-      the same reason.
-   ====================================================================== */
-
-
-/* ==========================================================================
-   PHONE  max-width 767px
-   Target 390px primary, 360px floor.
-   ====================================================================== */
-@media (max-width: 767px) {
-
-  /* ======================================================================
-     PAGE SHELL  prevent any background bleed above the transparent nav
-     before the hero video paints
-     ====================================================================== */
-
-  /* Triple-layer navy backstop. iOS Safari and Brave Mobile expose different
-     background layers depending on dynamic-viewport state. Setting html, body,
-     and #hero all navy ensures whichever layer the browser exposes through
-     the chrome zone is filled. All white sections (#about, #validation,
-     #leadership, #engage) own explicit white backgrounds in components.css
-     so the body navy doesn't leak into them. */
-  html,
-  body {
-    background-color: var(--gl-navy);
-  }
-
-  #hero {
-    background-color: var(--gl-navy);
-  }
-
-  /* ======================================================================
-     NAV  60px height. Ghost nav from components.css applies unchanged.
-     ====================================================================== */
-
-  /* Mirror the desktop .site-nav positioning verbatim.
-     Desktop uses position: fixed with left: 0 and right: 0, letting the
-     browser compute width from both anchors. This works correctly and
-     does not move on scroll. Previous mobile overrides used width: 100vw
-     and right: auto, which recalculated on every browser-chrome show/hide
-     and caused the nav to appear to move during scroll. Match desktop
-     exactly so behavior matches. */
-  .site-nav,
-  .site-nav.is-scrolled {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin: 0;
-    transform: none;
-  }
-
-  .nav-inner {
-    height: 60px;
-  }
-
-  /* Logo: 28px tall, intrinsic width. Global img reset sets max-width: 100%,
-     which would clamp the logo to its parent container; !important required
-     because the global selector is `img` (0,0,0,1) and lives in global.css
-     which we cannot reorder, and width: auto alone will not defeat
-     max-width: 100% on a wide nav cell. */
-  .nav-logo img {
-    height: 28px;
-    width: auto;
-    max-width: none !important; /* defeat global img max-width: 100% */
-  }
-
-  /* Hamburger sits above all content including cinematic overlays */
-  .nav-toggle {
-    z-index: 9999;
-    position: relative;
-  }
-
-  /* Open menu panel must also sit above all content. Force display: none when
-     closed so the panel does not paint as a navy strip at the top of the page.
-     components.css applies display: flex without a media query, which beats
-     global.css's mobile display: none. Re-enforce the hide here. */
-  .nav-links {
-    display: none;
-    z-index: 9999;
-    top: 60px;
-  }
-
-  .nav-links.is-open {
-    display: flex;
-  }
-
-
-  /* ======================================================================
-     HERO  headline scaled for 390px viewport, video untouched
-     ====================================================================== */
-
-  /* Hero overlay's top-of-gradient navy darkening (rgba(50,62,72,0.35) at 0%)
-     creates the visible "strip" in the nav zone on mobile. On scroll, that
-     35% darkening stacks with the frosted nav's 75% navy and exaggerates the
-     contrast against the hero below. Start the gradient transparent at the
-     top so the nav zone reads as pure hero video. Keep the bottom anchor for
-     headline contrast. */
-  .hero-overlay {
-    background: linear-gradient(
-      to bottom,
-      rgba(50, 62, 72, 0) 0%,
-      rgba(50, 62, 72, 0) 40%,
-      rgba(26, 26, 26, 0.60) 100%
-    );
-  }
-
-  .hero-headline {
-    /* Tighter clamp than desktop floor (3.25rem). Two-line wrap stays clean
-       at 360px without horizontal scroll. */
-    font-size: clamp(2.5rem, 11vw, 3.25rem);
-    line-height: 1.05;
-  }
-
-
-  /* ======================================================================
-     LOGIC  verify no overflow at 360px floor
-     ====================================================================== */
-
-  .logic-stat {
-    /* Desktop clamp floor is 6rem which can press against 360px; tighten. */
-    font-size: clamp(4.5rem, 22vw, 6rem);
-  }
-
-  .logic-statement {
-    font-size: clamp(1.25rem, 5vw, 1.5rem);
-  }
-
-
-  /* ======================================================================
-     ABOUT  single column, illustration stacks below text, centered
-     ====================================================================== */
-
-  /* components.css already stacks .about-inner below 900px; we tune sizing. */
-  .about-heading {
-    /* Compress heading for 390px so two- and three-word lines read clean. */
-    font-size: clamp(1.75rem, 7vw, 2.25rem);
-  }
-
-  .about-figure {
-    /* Center the illustration block under the text and cap its width so it
-       does not dominate the column. */
-    align-self: center;
-    max-width: 85%;
-  }
-
-  .about-figure img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-  }
-
-
-  /* ======================================================================
-     PROOF  2x2 icon grid stays (components.css already does this).
-     Scale line stacks vertically; pipe dividers hidden.
-     ====================================================================== */
-
-  .proof-scale {
-    flex-direction: column;
-    gap: var(--space-sm);
-  }
-
-  .proof-scale-divider {
-    display: none;
-  }
-
-
-  /* ======================================================================
-     REACH  full width map, centered statement
-     ====================================================================== */
-
-  .reach-map {
-    max-width: 100%;
-  }
-
-  .reach-map img {
-    width: 100%;
-    height: auto;
-  }
-
-  .reach-statement {
-    text-align: center;
-  }
-
-
-  /* ======================================================================
-     EXPERTISE / BENTO  single-card carousel scaffold
-
-     Cards stack to a single column at mobile in components.css. To convert
-     that stack into a carousel where only the .is-active card is visible,
-     we collapse the grid to a single relative container and absolutely
-     position the cards inside it. Only the card carrying .is-active renders.
-
-     touch-action: pan-y keeps vertical page scroll working while the
-     carousel JS handles horizontal swipe gestures.
-
-     No control markup exists in #expertise yet; arrow and dot rules will
-     be added when that markup ships.
-     ====================================================================== */
-
-  /* Tighten section padding and heading margin to match desktop visual ratio */
-  #expertise {
-    padding-block: var(--space-xl);
-  }
-
-  .expertise__heading {
-    margin-block-end: var(--space-md);
-  }
-
-  .bento {
-    position: relative;
-    display: block;
-    overflow: hidden;
-    /* Fixed height so card swaps never resize the container.
-       Tuned to fit the tallest card's natural content at 390px width
-       (3-line body + padding + button), matching desktop card ratio. */
-    height: 280px;
-    touch-action: pan-y;
-  }
-
-  .bento__card {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--duration-default) var(--ease-stellar);
-    height: auto;
-  }
-
-  .bento__card.is-active {
-    opacity: 1;
-    pointer-events: auto;
-    /* Stays position: absolute (inherited from .bento__card). The container's
-       fixed height owns layout; the active card never pushes it. */
-  }
-
-  /* Accent cards (01 Market Analysis, 04 Funding Assistance) carry a 4px
-     green left border on desktop. On mobile that spine creates a width
-     mismatch against the other cards in the same carousel slot, causing
-     a horizontal flicker on swipe. Normalize to the default 1px border. */
-  .bento__card--accent {
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
-  }
-
-  /* Defuse GSAP reveal: the carousel structure changes scroll-trigger geometry,
-     leaving cards stuck at translateY(40px) which produces a large gap above
-     the bento. Force final position and let .is-active handle visibility. */
-  .bento__card.reveal-content {
-    opacity: 0;
-    transform: none;
-  }
-
-  .bento__card.reveal-content.is-active {
-    opacity: 1;
-  }
-
-  /* Bento controls -- sized to match team and testimonials carousels */
-  .bento-controls {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-xl);
-    margin-top: var(--space-sm);
-    padding-bottom: var(--space-lg);
-  }
-
-  .bento-arrow {
-    background: none;
-    border: none;
-    color: var(--gl-green-vivid);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0;
-    min-height: 48px;
-    min-width: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color var(--duration-fast) var(--ease-stellar);
-  }
-
-  .bento-arrow:hover {
-    color: var(--gl-white);
-  }
-
-  /* Dots match .testimonials__dot spec from components.css exactly */
-  .bento-dots {
-    display: flex;
-    gap: var(--space-sm);
-    align-items: center;
-  }
-
-  .bento-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.30);
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    transition: background-color var(--duration-fast) var(--ease-stellar);
-  }
-
-  .bento-dot.is-active {
-    background-color: var(--gl-green);
-  }
-
-
-  /* ======================================================================
-     VALIDATION / MARQUEE
-     Gap reduced. Per-logo transform: scale(...) rules in components.css are
-     preserved by NOT writing any rule that sets transform on .marquee__item img.
-     ====================================================================== */
-
-  .marquee__track {
-    gap: 1.5rem;
-    align-items: center;
-  }
-
-
-  /* ======================================================================
-     LEADERSHIP / TEAM CAROUSEL  photo crop tuned for portrait viewport
-     ====================================================================== */
-
-  .team-carousel {
-    touch-action: pan-y;
-  }
-
-  .team-card__img-wrap {
-    /* Override aspect-ratio square at mobile so we can lock a fixed height. */
-    aspect-ratio: auto;
-    height: 380px;
-  }
-
-  .team-card__img-wrap img {
-    object-fit: cover;
-    object-position: center 25%; /* default head framing for all cards */
-  }
-
-
-  /* ======================================================================
-     TESTIMONIALS  verify no overflow at 360px
-     ====================================================================== */
-
-  .testimonials__carousel {
-    touch-action: pan-y;
-  }
-
-  .testimonial__quote p {
-    /* Desktop uses --text-body-lg (typically ~1.125rem). Hold a controlled
-       16px at 360px to prevent line-break orphans on long quotes. */
-    font-size: 1rem;
-    line-height: 1.7;
-  }
-
-
-  /* ======================================================================
-     ENGAGE  single column, fields full width, contact stacks
-     ====================================================================== */
-
-  /* components.css drops .engage__inner to one column under 64rem already.
-     Here we stack the dual phone/contact row and let the address wrap. */
-  .engage__address {
-    white-space: normal; /* components.css forces nowrap; allow wrap on phones */
-  }
-
-  .engage__contact-row {
-    flex-direction: column;
-    gap: var(--space-md);
-  }
-
-  /* components.css already collapses .engage-form to 1fr under 40rem.
-     No further override needed for field widths. */
-
-  .form-submit {
-    width: 100%;
-    align-self: stretch;
-  }
-
-
-  /* ======================================================================
-     FOOTER  legal centered at minimum legible size
-     ====================================================================== */
-
-  .footer__legal {
-    text-align: center;
-    font-size: var(--text-sm);
-  }
-
+/* =============================================================
+   projects.css -- scoped to projects.html only
+   All color values via CSS custom properties from tokens.css.
+   Mobile-first. min-width breakpoints scale up.
+   No magic numbers without explanatory comments.
+   ============================================================= */
+
+.projects-header {
+  background: var(--gl-navy);
+  position: sticky;
+  top: 72px; /* Sits flush below the 72px main nav -- not behind it */
+  z-index: 50; /* Below --z-nav (100) so nav always sits on top of pill bar */
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
-
-/* ==========================================================================
-   TABLET  min-width 768px and max-width 1279px
-
-   Desktop layout from components.css largely applies cleanly in this range.
-   The block below relieves edge-pressure spots only.
-   ====================================================================== */
-@media (min-width: 768px) and (max-width: 1279px) {
-
-  /* Bento drops to two columns at 48rem in components.css; three columns
-     only kick in at 72rem. Both behaviors are correct for tablet  no
-     override needed here. */
-
-  /* Engage stays single-column until 64rem (1024px), then becomes two-column.
-     The two-column form below 1024px would crowd; let components.css handle. */
-
-  /* Team carousel: components.css shifts to 33.333% width per card at 48rem.
-     At narrow tablet (~768px) that yields ~240px per card which is acceptable;
-     no override. */
-
-  /* Marquee gap on tablet sits between mobile (2rem) and desktop (3rem).
-     Hold the components.css 3rem  the wider viewport absorbs it. */
+/* Projects page has no hero video behind the nav. The components.css default
+   is background: transparent, which renders with the white page content
+   showing through. Force solid navy as the resting state. The
+   .site-nav.is-scrolled rule in components.css will replace this with the
+   frosted-glass ghost background on scroll. No !important here so the
+   scrolled state can win cleanly.
+   z-index: 9999 beats cinematic-content (--z-overlay: 10) and the pill
+   bar (50). Using 9999 instead of --z-modal (1000) as belt-and-braces. */
+.site-nav {
+  background: var(--gl-navy);
+  z-index: 9999 !important;
 }
 
-/* ==========================================================================
-   PROJECTS.HTML  phone (max-width 767px) and tablet (768px to 1279px)
+.projects-header.is-scrolled {
+  background: rgba(50, 62, 72, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
 
-   Appended after the index.html mobile/tablet blocks. Targets only classes
-   confirmed present in projects.html and styled in projects.css. The site
-   nav (.site-nav, .nav-inner, .nav-toggle, .nav-links) is shared with
-   index.html and remains governed by the existing mobile block above; no
-   rule below targets nav internals.
+.projects-header-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 3vw, 2rem) clamp(1.25rem, 4vw, 3rem);
+}
 
-   Layout truths that drive every override here:
-   - projects.css base .project-row is grid-template-columns: 1fr. The
-     two-column rule lives inside its own @media (min-width: 768px) block.
-     Phone inherits single-column naturally  no column override needed.
-   - .projects-header has unconditional top: 72px. Must drop to 60px at
-     phone to sit flush below the mobile nav.
-   - .project-image-block carries unconditional aspect-ratio: 4/3. Any
-     explicit height we set at phone must also unset aspect-ratio or the
-     two rules fight and produce inconsistent block heights.
-   - .project-row-cinematic carries unconditional aspect-ratio: 16/9. At
-     390px that renders ~219px tall  not enough for headline + teaser +
-     trigger. Replace with explicit 480px and unset aspect-ratio.
-   ====================================================================== */
+.category-nav {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
 
+.category-pill {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--gl-white);
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-full);
+  padding: 0 1.5rem;
+  height: 48px; /* Senior touch target */
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-stellar),
+              border-color var(--duration-fast) var(--ease-stellar),
+              color var(--duration-fast) var(--ease-stellar);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
 
-/* ==========================================================================
-   PROJECTS  PHONE  max-width 767px
-   ====================================================================== */
-@media (max-width: 767px) {
+.category-pill:hover {
+  border-color: var(--gl-green);
+  color: var(--gl-green);
+}
 
-  /* ----------------------------------------------------------------------
-     PILL BAR  sticky below the 60px mobile nav, solid navy, no blur.
-     Five pills must fit one row at 360px floor with no horizontal scroll.
-     ---------------------------------------------------------------------- */
+.category-pill.is-active {
+  background: var(--gl-green);
+  border-color: var(--gl-green);
+  color: var(--gl-white);
+}
 
-  .projects-header {
-    top: 60px; /* Flush below 60px mobile nav (desktop default is 72px) */
-    background: var(--gl-navy);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    z-index: 200; /* Above projects-grid (base) and reveal layers, below site-nav (9999) */
+.projects-grid {
+  background: var(--gl-white);
+  display: flex;
+  flex-direction: column; /* Flush stacking -- no gaps */
+}
+
+.projects-grid > article:first-child {
+  padding-top: 72px; /* Offsets fixed nav height so first cinematic row is not obscured */
+}
+
+/* --- Editorial row -------------------------------------------- */
+
+.project-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-bottom: 1px solid rgba(50, 62, 72, 0.12);
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .project-row {
+    grid-template-columns: 50% 50%;
   }
 
-  /* Re-enforce solid navy in the scrolled state. projects.css applies a
-     translucent rgba background with backdrop-filter when .is-scrolled is
-     toggled  on phone the blur creates a visible seam against the nav
-     above. Hold a solid fill so the two bars read as one navy strip. */
-  .projects-header.is-scrolled {
-    background: var(--gl-navy);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+  .project-row.is-reversed .project-image-block {
+    order: 2;
   }
 
-  .projects-header-inner {
-    /* Tighten vertical padding to keep the combined nav + pill bar height
-       inside ~96px. Desktop clamp resolves to ~24px at 390px which is fine;
-       we lock 12px to give the pills more vertical room without growing the bar. */
-    padding: 12px clamp(0.75rem, 3vw, 1.25rem);
-  }
-
-  .category-nav {
-    flex-wrap: wrap; /* Allows Heritage to wrap under Resorts on 2nd row */
-    overflow-x: hidden;
-    gap: 6px;
-    justify-content: flex-start; /* Heritage sits under Resorts, not pushed right */
-  }
-
-  .category-pill {
-    /* Compress padding, font-size, and height. Desktop pills are 48px tall
-       with 1.5rem horizontal padding  too wide to fit 5 at 390px. The
-       senior touch target rule still holds at 48px via height: 48px on the
-       parent .projects-header (combined hit-state with the bar). */
-    height: 36px;
-    padding: 0 0.75rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.04em; /* Slightly tighter than desktop's --tracking-wide for fit */
-    flex-shrink: 1;
-    min-width: 0; /* Allows flex children to shrink below content width */
-  }
-
-  /* ----------------------------------------------------------------------
-     FIRST ROW OFFSET  clear the fixed nav AND the sticky pill bar.
-
-     Sticky element heights at phone:
-       Nav:        60px
-       Pill bar:   ~60px (12px top + 36px pill + 12px bottom)
-     Total:        ~120px
-
-     projects.css sets padding-top: 72px unconditionally on the first
-     article. Bump to 132px at phone so the first cinematic row clears
-     both stacked bars with a small breathing margin.
-     ---------------------------------------------------------------------- */
-
-  .projects-grid > article:first-child {
-    padding-top: 132px;
-  }
-
-  /* ----------------------------------------------------------------------
-     CINEMATIC ROWS  unified card layout on mobile.
-
-     Every cinematic project renders as the same card as editorial:
-     image on top (260px), then location/title/teaser/trigger below,
-     then brief panel expanding underneath when triggered.
-
-     Selectors use compound form (article.project-row-cinematic) which
-     gives specificity (0,1,1)  beats projects.css single-class
-     selectors (0,1,0) without needing !important.
-     ---------------------------------------------------------------------- */
-
-  article.project-row-cinematic {
-    aspect-ratio: unset;
-    height: auto;
-    min-height: 0;
-    position: static;
-    overflow: visible;
-    display: block;
-    contain: layout; /* Isolate layout calculation so scroll doesn't repaint nav */
-  }
-
-  article.project-row-cinematic .cinematic-image-wrap {
-    position: static;
-    inset: auto;
-    width: 100%;
-    height: 260px;
-    overflow: hidden;
-  }
-
-  article.project-row-cinematic .cinematic-image-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
-  }
-
-  article.project-row-cinematic .cinematic-image-wrap::after {
-    display: none;
-  }
-
-  article.project-row-cinematic .cinematic-content {
-    position: static;
-    inset: auto;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    top: auto;
-    width: 100%;
-    max-width: 100%;
-    padding: 2rem 1.25rem;
-    background: var(--gl-white);
-  }
-
-  article.project-row-cinematic .cinematic-location {
-    display: block;
-    background: transparent;
-    color: var(--gl-green);
-    padding: 0;
-    border-radius: 0;
-    margin-bottom: var(--space-xs);
-    font-size: var(--text-sm);
-    letter-spacing: var(--tracking-widest);
-    text-transform: uppercase;
-    width: fit-content;
-  }
-
-  article.project-row-cinematic .cinematic-title {
-    color: var(--gl-navy);
-    text-shadow: none;
-    font-size: clamp(1.5rem, 6vw, 2rem);
-    margin-bottom: var(--space-md);
-  }
-
-  article.project-row-cinematic .cinematic-teaser {
-    color: var(--gl-navy);
-    opacity: 0.75;
-    text-shadow: none;
-    font-size: var(--text-body);
-    line-height: var(--leading-loose);
-    margin-bottom: var(--space-lg);
-  }
-
-  article.project-row-cinematic .cinematic-trigger {
-    color: var(--gl-green);
-  }
-
-  article.project-row-cinematic .cinematic-panel {
-    position: static;
-    width: 100%;
-  }
-
-  /* ----------------------------------------------------------------------
-     EDITORIAL ROWS  fixed image height, full width on mobile.
-
-     Compound selector article.project-row .project-image-block (0,1,1)
-     beats projects.css .project-image-block (0,1,0) so we can override
-     aspect-ratio: 4/3 without !important.
-     ---------------------------------------------------------------------- */
-
-  article.project-row .project-image-block {
-    aspect-ratio: unset;
-    width: 100%;
-    height: 260px;
-    overflow: hidden;
+  .project-row.is-reversed .project-image-block {
     border-right: none;
-    border-left: none;
-    contain: layout; /* Isolate layout calculation so scroll doesn't repaint nav */
+    border-left: 1px solid rgba(50, 62, 72, 0.12);
   }
 
-  article.project-row .project-image-block img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
-    display: block;
+  .project-row.is-reversed .project-text-block {
+    order: 1;
   }
-
-  article.project-row .project-text-block {
-    width: 100%;
-    padding: 2rem 1.25rem;
+ .project-row.is-reversed .project-panel {
+   order: 3; /* Forces panel below both columns regardless of visual reorder */
   }
-
-  article.project-row.is-reversed .project-image-block,
-  article.project-row.is-reversed .project-text-block,
-  article.project-row.is-reversed .project-panel {
-    order: 0;
-  }
-
-  /* ----------------------------------------------------------------------
-     BRIEF PANELS  readable padding, 48px close-button hit-state.
-     ---------------------------------------------------------------------- */
-
-  .project-panel-inner,
-  .cinematic-panel-inner {
-    padding: 1.5rem 1.25rem;
-  }
-
-  .project-panel,
-  .cinematic-panel {
-    touch-action: pan-y; /* Vertical scroll inside an open panel never blocked */
-  }
-
-  .project-close,
-  .cinematic-close {
-    min-height: 48px;
-    min-width: 48px;
-  }
-
 }
 
+.project-image-block {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3; /* Fills column -- no thumbnail, no border, no padding */
+  border-right: 1px solid rgba(50, 62, 72, 0.12);
+}
 
-/* ==========================================================================
-   PROJECTS  TABLET  min-width 768px and max-width 1279px
+.project-image-block img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
 
-   At 768px the desktop layout is largely correct. The two adjustments below
-   are nav-height alignment (the projects header sits 72px below the top to
-   match the tablet/desktop nav, which projects.css already specifies  so
-   no override needed) and ensuring the phone overrides above do not leak.
+.project-text-block {
+  padding: clamp(2rem, 4vw, 3.5rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--gl-white);
+}
 
-   What's already correct from projects.css at 768px+:
-   - .project-row two-column grid restored via its own @media min-width: 768px
-   - .project-row.is-reversed order rules restored in the same block
-   - .project-image-block aspect-ratio: 4/3 active (no phone height override
-     applies above 767px because the phone block uses max-width: 767px)
-   - .project-row-cinematic aspect-ratio: 16/9 active (same reason  at
-     768px this renders ~432px tall, sufficient for overlay content)
-   - .projects-header top: 72px (already correct for tablet nav)
-   - Pill desktop sizing restored (phone overrides do not apply)
-   - Brief panel padding restored
+.project-location {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-widest);
+  color: var(--gl-green);
+  text-transform: uppercase;
+  margin-bottom: var(--space-xs);
+}
 
-   No tablet-specific rules are required for projects.html. The block below
-   is present for symmetry with the index.html tablet block above and as a
-   documented anchor for future tablet-only adjustments if the visual review
-   surfaces edge cases.
-   ====================================================================== */
-@media (min-width: 768px) and (max-width: 1279px) {
+.project-title {
+  font-family: var(--font-header);
+  font-size: var(--text-h2);
+  font-weight: 400;
+  color: var(--gl-navy);
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-md);
+}
 
-  /* No overrides needed  desktop layout from projects.css applies cleanly
-     across this range. Leave intentionally empty as a documented anchor. */
+.project-teaser {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--gl-navy);
+  line-height: var(--leading-loose);
+  margin-bottom: var(--space-lg);
+  opacity: 0.75;
+}
 
+.project-trigger {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--gl-green);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  transition: gap var(--duration-fast) var(--ease-stellar),
+              opacity var(--duration-fast) var(--ease-stellar);
+  text-decoration: none;
+}
+
+.project-trigger:hover {
+  gap: 0.75rem;
+  opacity: 0.8;
+}
+
+.project-panel {
+  grid-column: 1 / -1;
+  max-height: 0;
+  overflow: hidden;
+  background: var(--gl-navy);
+  border-left: 3px solid var(--gl-green);
+  transition: max-height 0.6s var(--ease-stellar);
+}
+
+.project-panel.is-open {
+  max-height: 2000px; /* High cap -- accommodates any brief length */
+}
+
+.project-panel-inner {
+  padding: clamp(2rem, 4vw, 3rem) clamp(2rem, 4vw, 3.5rem);
+}
+
+.project-panel p {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--gl-white);
+  line-height: var(--leading-loose);
+  max-width: 72ch;
+}
+
+.project-panel p + p {
+  margin-top: var(--space-md);
+}
+
+.project-close {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--gl-white);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  margin-top: var(--space-lg);
+  opacity: 0.65;
+  transition: opacity var(--duration-fast) var(--ease-stellar),
+              gap var(--duration-fast) var(--ease-stellar);
+}
+
+.project-close:hover {
+  opacity: 1;
+  gap: 0.75rem;
+}
+
+/* --- Cinematic row -------------------------------------------- */
+
+.project-row-cinematic {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid rgba(50, 62, 72, 0.12);
+  margin: 0;
+}
+
+.cinematic-image-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-base);
+  overflow: hidden; /* Contains image within the fixed aspect-ratio frame -- not the parent */
+}
+
+.cinematic-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center; /* Anchors to top -- preserves subject on tall images */
+  display: block;
+}
+
+/* Bottom-third gradient scrim -- text lifts off image with real weight */
+.cinematic-image-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(50, 62, 72, 0.75) 0%,
+    rgba(50, 62, 72, 0.40) 25%,
+    transparent 60%
+  );
+}
+
+.cinematic-content {
+  position: relative;
+  z-index: var(--z-overlay);
+  padding: clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem);
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: inherit;
+}
+
+.cinematic-location {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--gl-white);
+  background: var(--gl-green);
+  width: fit-content; /* Pill hugs text -- never stretches full width */
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+}
+
+.cinematic-title {
+  font-family: var(--font-header);
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 400;
+  color: var(--gl-white);
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-md);
+  /* Dual-layer shadow: spread for lift, tight for crispness */
+  text-shadow:
+    0 2px 24px rgba(0, 0, 0, 0.65),
+    0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.cinematic-teaser {
+  font-family: var(--font-body);
+  font-size: var(--text-body-lg);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: var(--leading-loose);
+  margin-bottom: var(--space-lg);
+  text-shadow:
+    0 1px 12px rgba(0, 0, 0, 0.5),
+    0 1px 3px rgba(0, 0, 0, 0.75);
+  max-width: 56ch;
+}
+
+.cinematic-trigger {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--gl-white);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  transition: gap var(--duration-fast) var(--ease-stellar),
+              opacity var(--duration-fast) var(--ease-stellar);
+}
+
+.cinematic-trigger:hover {
+  gap: 0.75rem;
+  opacity: 0.8;
+}
+
+.cinematic-panel {
+  position: relative;
+  z-index: var(--z-overlay);
+  max-height: 0;
+  overflow: hidden;
+  background: var(--gl-navy);
+  border-left: 3px solid var(--gl-green);
+  transition: max-height 0.6s var(--ease-stellar);
+}
+
+.cinematic-panel.is-open {
+  max-height: 2000px; /* High cap -- accommodates any brief length */
+}
+
+.cinematic-panel-inner {
+  padding: clamp(2rem, 4vw, 3rem) clamp(2rem, 4vw, 3.5rem);
+}
+
+.cinematic-panel p {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--gl-white);
+  line-height: var(--leading-loose);
+  max-width: 72ch;
+}
+
+.cinematic-panel p + p {
+  margin-top: var(--space-md);
+}
+
+.cinematic-close {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--gl-white);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  margin-top: var(--space-lg);
+  opacity: 0.65;
+  transition: opacity var(--duration-fast) var(--ease-stellar),
+              gap var(--duration-fast) var(--ease-stellar);
+}
+
+.cinematic-close:hover {
+  opacity: 1;
+  gap: 0.75rem;
+}
+
+/* --- Footer --------------------------------------------------- */
+
+.projects-footer {
+  background: var(--gl-navy);
+  padding: var(--space-xl) clamp(1.25rem, 4vw, 3rem);
+  text-align: center;
+}
+
+.projects-footer p {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+/* --- GSAP reveal initial states ------------------------------- */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(32px);
+}
+
+[data-reveal="left"] {
+  opacity: 0;
+  transform: translateX(-48px);
+}
+
+[data-reveal="right"] {
+  opacity: 0;
+  transform: translateX(48px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal="left"],
+  [data-reveal="right"] {
+    opacity: 1;
+    transform: none;
+  }
 }
