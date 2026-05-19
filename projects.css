@@ -13,12 +13,16 @@
   transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
-/* z-index needs to beat cinematic-content (--z-overlay: 10) and the pill
-   bar (50). Using 9999 instead of --z-modal (1000) as belt-and-braces.
-   Background is intentionally NOT set here -- the nav inherits the ghost
-   behavior from components.css: transparent at scroll=0, frosted glass on
-   scroll. This matches the index.html nav exactly. */
+/* Projects page has no hero video behind the nav. The components.css default
+   is background: transparent, which renders with the white page content
+   showing through. Force solid navy as the resting state. The
+   .site-nav.is-scrolled rule in components.css will replace this with the
+   frosted-glass ghost background on scroll. No !important here so the
+   scrolled state can win cleanly.
+   z-index: 9999 beats cinematic-content (--z-overlay: 10) and the pill
+   bar (50). Using 9999 instead of --z-modal (1000) as belt-and-braces. */
 .site-nav {
+  background: var(--gl-navy);
   z-index: 9999 !important;
 }
 
