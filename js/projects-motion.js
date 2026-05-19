@@ -33,15 +33,19 @@
   }
 
   /* ============================================================
-     1. LENIS -- desktop only
-     Lenis + GSAP ScrollTrigger fighting on mobile causes choppy scroll.
-     Native scroll is smoother on touch devices.
+     1. LENIS -- enabled on all viewports
+     Previously disabled on mobile to avoid choppy scroll, but native mobile
+     scroll causes the fixed nav to shift during browser address-bar show/hide
+     transitions, producing a visible jump. Index uses Lenis on all viewports
+     and the nav stays locked. Matching that here so projects nav behaves the
+     same. Ken Burns scrub animation still skipped on mobile below (line ~165)
+     since that was the actual jank source the original code was working around.
      ============================================================ */
 
   let lenis = null;
   const isMobileViewport = window.innerWidth <= 767;
 
-  if (typeof Lenis !== 'undefined' && !isMobileViewport) {
+  if (typeof Lenis !== 'undefined') {
     lenis = new Lenis({
       duration: 1.2,
       easing: function (t) {
@@ -58,7 +62,7 @@
 
     ScrollTrigger.refresh();
 
-  } else if (!isMobileViewport) {
+  } else {
     console.warn('projects-motion.js: Lenis not found. Falling back to native scroll.');
   }
 
