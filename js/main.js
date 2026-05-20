@@ -869,7 +869,8 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   if (pageUnderlay && !prefersReducedMotionForBleed) {
 
     /* Read stops from tokens.css at runtime. Avoids duplicating hex values
-       in JS -- single source of truth lives in tokens.css. */
+       in JS -- single source of truth lives in tokens.css.
+       Read once at outer scope so both desktop and mobile paths share them. */
     const computed = getComputedStyle(document.documentElement);
     const stops = [
       computed.getPropertyValue('--bleed-stop-1').trim(), /* #FFFFFF */
@@ -882,64 +883,119 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
       computed.getPropertyValue('--bleed-stop-8').trim()  /* #323E48 */
     ];
 
-    /* Helper: build a multi-stop GSAP timeline that walks the underlay
-       from one chapter color to another through all 8 stops.
-       fromIdx and toIdx are indices into the stops array.
-       trigger / start / end define the scroll window the bleed lives in. */
-    function buildBleed(trigger, start, end, fromIdx, toIdx) {
-      const tl = gsap.timeline({
+    /* ----------------------------------------------------------------
+       gsap.matchMedia: separate desktop and mobile bleed implementations.
+       Each path is fully sandboxed -- ScrollTriggers auto-clean up when
+       the breakpoint exits. Desktop and mobile code never share state.
+       ---------------------------------------------------------------- */
+    const bleedMM = gsap.matchMedia();
+
+    /* ================================================================
+       DESKTOP PATH (>= 768px)
+       Identical to the original section-triggered implementation.
+       Three separate timelines, each tied to a triggering section entering
+       the viewport. End position 'top 60%' so the chapter color lands
+       before the section's main content arrives.
+       ================================================================ */
+    bleedMM.add('(min-width: 768px)', function () {
+
+      /* Helper local to desktop scope: build a multi-stop timeline that
+         walks the underlay from one chapter color to another through
+         all 8 stops. */
+      function buildBleed(trigger, start, end, fromIdx, toIdx) {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: trigger,
+            start: start,
+            end: end,
+            scrub: true /* Tied directly to scroll position -- A&I behavior */
+          }
+        });
+
+        const sequence = [];
+        if (fromIdx < toIdx) {
+          for (let i = fromIdx; i <= toIdx; i++) sequence.push(stops[i]);
+        } else {
+          for (let i = fromIdx; i >= toIdx; i--) sequence.push(stops[i]);
+        }
+
+        sequence.forEach(function (color, i) {
+          if (i === 0) return;
+          tl.to(pageUnderlay, { backgroundColor: color, ease: 'none' });
+        });
+
+        return tl;
+      }
+
+      /* Bleed 1: navy → white as #logic enters */
+      buildBleed('#logic', 'top bottom', 'top 60%', 7, 0);
+      /* Bleed 2: white → navy as #proof enters */
+      buildBleed('#proof', 'top bottom', 'top 60%', 0, 7);
+      /* Bleed 3: navy → white as #validation enters */
+      buildBleed('#validation', 'top bottom', 'top 60%', 7, 0);
+
+      ScrollTrigger.refresh();
+    });
+
+
+    /* ================================================================
+       MOBILE PATH (< 768px)
+       Single timeline tied to the whole document, using percentage
+       keyframes mapped to chapter positions in the scrolled page.
+
+       Why a different architecture for mobile:
+       Section-triggered bleeds fail on mobile because mobile section
+       geometry is unstable -- the dynamic browser chrome (address bar
+       showing/hiding) shifts viewport height mid-scroll, which throws
+       off absolute pixel-based ScrollTrigger positions. The bleed
+       windows collapse to ~200px at the very top of the page, causing
+       the underlay to race through all stops on the first flick and
+       lock at the final color for the rest of the page.
+
+       This implementation binds the timeline to the document body
+       and uses keyframe percentages -- scroll progress is calculated
+       as a fraction of total scrollable distance, which scales
+       naturally with the elongated single-column mobile layout.
+
+       invalidateOnRefresh: true forces recalculation every time the
+       browser fires a resize event (including address bar toggles).
+
+       Keyframe percentage values are estimates based on typical mobile
+       layout proportions:
+         0-12%:  Hero (navy held)
+         12-20%: Bleed navy → white into Logic
+         20-40%: Logic + About (white held)
+         40-48%: Bleed white → navy into Proof
+         48-68%: Proof + Reach + Expertise (navy held)
+         68-76%: Bleed navy → white into Validation
+         76-100%: Validation through Footer (white held)
+       Adjust these if the bleeds land too early or too late on mobile.
+       ================================================================ */
+    bleedMM.add('(max-width: 767px)', function () {
+
+      gsap.timeline({
         scrollTrigger: {
-          trigger: trigger,
-          start: start,
-          end: end,
-          scrub: true /* Tied directly to scroll position -- A&I behavior */
+          trigger: document.body,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: true,
+          invalidateOnRefresh: true /* Critical: recalculate on every viewport change */
+        }
+      }).to(pageUnderlay, {
+        ease: 'none',
+        keyframes: {
+          '0%':   { backgroundColor: stops[7] }, /* navy   -- hero */
+          '12%':  { backgroundColor: stops[7] }, /* navy   -- hero end */
+          '20%':  { backgroundColor: stops[0] }, /* white  -- logic enters */
+          '40%':  { backgroundColor: stops[0] }, /* white  -- about end */
+          '48%':  { backgroundColor: stops[7] }, /* navy   -- proof enters */
+          '68%':  { backgroundColor: stops[7] }, /* navy   -- expertise end */
+          '76%':  { backgroundColor: stops[0] }, /* white  -- validation enters */
+          '100%': { backgroundColor: stops[0] }  /* white  -- footer */
         }
       });
 
-      /* Determine the stop sequence -- forward or reverse depending on
-         which chapter we're bleeding into. */
-      const sequence = [];
-      if (fromIdx < toIdx) {
-        for (let i = fromIdx; i <= toIdx; i++) sequence.push(stops[i]);
-      } else {
-        for (let i = fromIdx; i >= toIdx; i--) sequence.push(stops[i]);
-      }
-
-      /* Chain each stop as a step in the timeline. GSAP interpolates
-         RGB channels continuously between each pair. */
-      sequence.forEach(function (color, i) {
-        if (i === 0) return; /* Skip first -- it's the starting state */
-        tl.to(pageUnderlay, { backgroundColor: color, ease: 'none' });
-      });
-
-      return tl;
-    }
-
-    /* ----------------------------------------------------------------
-       BLEED 1 -- navy → white
-       Fires as #logic enters the viewport. Walks stops 8 → 1.
-       Ends at 'top 60%' -- color lands before the 90% is centered.
-       ---------------------------------------------------------------- */
-    buildBleed('#logic', 'top bottom', 'top 60%', 7, 0);
-
-    /* ----------------------------------------------------------------
-       BLEED 2 -- white → navy
-       Fires as #proof enters the viewport. Walks stops 1 → 8.
-       Ends at 'top 60%' -- color lands before proof numbers start
-       counting up.
-       ---------------------------------------------------------------- */
-    buildBleed('#proof', 'top bottom', 'top 60%', 0, 7);
-
-    /* ----------------------------------------------------------------
-       BLEED 3 -- navy → white
-       Fires as #validation enters the viewport. Walks stops 8 → 1.
-       Ends at 'top 60%' -- color lands before marquee fully arrives.
-       ---------------------------------------------------------------- */
-    buildBleed('#validation', 'top bottom', 'top 60%', 7, 0);
-
-    /* Tell ScrollTrigger to recalculate positions once the bleeds are
-       wired -- ensures the timelines pick up the correct scroll offsets
-       even if Lenis hasn't fully settled yet. */
-    ScrollTrigger.refresh();
+      ScrollTrigger.refresh();
+    });
   }
 }

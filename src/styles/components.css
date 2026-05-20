@@ -320,10 +320,11 @@
 }
 .logic-stat {
   font-family: var(--font-header);
-  /* Scaled up significantly from clamp(6rem, 16vw, 13rem). Now reads as the
-     largest typographic moment in the white chapter. Mobile floor of 8.5rem
-     (136px) keeps it dominant without overflowing a 360px viewport. */
-  font-size: clamp(8.5rem, 22vw, 18rem);
+  /* Reduced from clamp(8.5rem, 22vw, 18rem) -- previously larger than the
+     hero headline (clamp(3.25rem, 8vw + 1rem, 7.5rem) = max 7.5rem), which
+     felt off. Now sized just under hero max so the 90% reads as a strong
+     second beat without eclipsing the page opener. */
+  font-size: clamp(5rem, 14vw, 7rem);
   font-weight: 900;
   line-height: 0.9;
   color: var(--gl-green-vivid);
@@ -580,7 +581,14 @@
 #reach {
   /* Background removed -- transparent so .page-underlay bleeds through.
      Reach is part of the NAVY chapter; underlay sits at #323E48 here. */
-  padding: var(--section-pad-y) clamp(1.25rem, 5vw, 4rem);
+  /* Asymmetric padding -- full --section-pad-y on top, compressed
+     --space-2xl on bottom. Previously full on both, which stacked with
+     Expertise's full top padding creating ~280px of dead space between
+     the 'iconic skylines' line and 'MAXIMIZE YOUR RETURN'. Expertise
+     keeps its full top so the Maximize moment breathes properly. */
+  padding-block-start: var(--section-pad-y);
+  padding-block-end: var(--space-2xl);
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
 }
 
 .reach-inner {
