@@ -1054,60 +1054,60 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         ease: 'none',
         keyframes: {
           /* MOBILE BLEED MAP -- Full 8-stop walks matching desktop buildBleed.
-             
-             Section scroll positions (measured from live mobile page):
-                logic:      14.3%
-                proof:      37.2%
-                validation: 67.3%
-             
-             Each chapter transition walks through ALL 8 stops (same as
-             desktop). The 8-stop walk gives mobile the same perceptual
-             feel as desktop's chained buildBleed tweens -- intermediate
-             tonal anchors at each stop, not just linear endpoint-to-endpoint
-             interpolation.
-             
-             Each transition window is 9% of scroll. Stops are spaced
-             evenly within each window so the walk feels continuous. The
-             end of each transition lands exactly at the target section.
-             Note: GSAP keyframes use unique percentage keys -- no two
-             keys can be the same percentage. */
+
+             Section positions (measured): logic 14.3%, proof 37.2%, valid 67.3%.
+
+             End points pulled 3% EARLIER than the actual section positions:
+                Bleed 1 ends at 11% (logic enters at 14.3%)
+                Bleed 2 ends at 34% (proof enters at 37.2%)
+                Bleed 3 ends at 64% (validation enters at 67.3%)
+
+             Why earlier: on real mobile (vs DevTools emulator), three things
+             slow perceived bleed completion:
+             (1) Address bar show/hide reflows the page, triggering
+                 invalidateOnRefresh which briefly desyncs keyframe positions.
+             (2) Touch scroll velocity is faster than mouse wheel -- user
+                 burns through scroll percentages before scrub catches up.
+             (3) Lenis smoothing adds a fraction of catchup time on top.
+             Pulling end-points 3% earlier compensates so the chapter color
+             is settled before the user reads section content. */
 
           /* Hero: held navy */
           '0%':     { backgroundColor: stops[7] },
 
-          /* Bleed 1: navy → white walk into Logic (lands at 14%) */
-          '5%':     { backgroundColor: stops[7] }, /* navy hold end / walk start */
-          '6.3%':   { backgroundColor: stops[6] },
-          '7.6%':   { backgroundColor: stops[5] },
-          '8.9%':   { backgroundColor: stops[4] },
-          '10.2%':  { backgroundColor: stops[3] },
-          '11.5%':  { backgroundColor: stops[2] },
-          '12.8%':  { backgroundColor: stops[1] },
-          '14%':    { backgroundColor: stops[0] }, /* LANDS AT logic 14.3% */
+          /* Bleed 1: navy → white walk, lands at 11% (3% before logic at 14.3%) */
+          '2%':     { backgroundColor: stops[7] }, /* navy hold end / walk start */
+          '3.3%':   { backgroundColor: stops[6] },
+          '4.6%':   { backgroundColor: stops[5] },
+          '5.9%':   { backgroundColor: stops[4] },
+          '7.2%':   { backgroundColor: stops[3] },
+          '8.5%':   { backgroundColor: stops[2] },
+          '9.8%':   { backgroundColor: stops[1] },
+          '11%':    { backgroundColor: stops[0] }, /* LANDS before logic 14.3% */
 
           /* Logic + About: held white */
-          '28%':    { backgroundColor: stops[0] },
+          '25%':    { backgroundColor: stops[0] },
 
-          /* Bleed 2: white → navy walk into Proof (lands at 37%) */
-          '29.3%':  { backgroundColor: stops[1] },
-          '30.6%':  { backgroundColor: stops[2] },
-          '31.9%':  { backgroundColor: stops[3] },
-          '33.2%':  { backgroundColor: stops[4] },
-          '34.5%':  { backgroundColor: stops[5] },
-          '35.8%':  { backgroundColor: stops[6] },
-          '37%':    { backgroundColor: stops[7] }, /* LANDS AT proof 37.2% */
+          /* Bleed 2: white → navy walk, lands at 34% (3% before proof at 37.2%) */
+          '26.3%':  { backgroundColor: stops[1] },
+          '27.6%':  { backgroundColor: stops[2] },
+          '28.9%':  { backgroundColor: stops[3] },
+          '30.2%':  { backgroundColor: stops[4] },
+          '31.5%':  { backgroundColor: stops[5] },
+          '32.8%':  { backgroundColor: stops[6] },
+          '34%':    { backgroundColor: stops[7] }, /* LANDS before proof 37.2% */
 
           /* Proof + Reach + Expertise: held navy */
-          '58%':    { backgroundColor: stops[7] },
+          '55%':    { backgroundColor: stops[7] },
 
-          /* Bleed 3: navy → white walk into Validation (lands at 67%) */
-          '59.3%':  { backgroundColor: stops[6] },
-          '60.6%':  { backgroundColor: stops[5] },
-          '61.9%':  { backgroundColor: stops[4] },
-          '63.2%':  { backgroundColor: stops[3] },
-          '64.5%':  { backgroundColor: stops[2] },
-          '65.8%':  { backgroundColor: stops[1] },
-          '67%':    { backgroundColor: stops[0] }, /* LANDS AT validation 67.3% */
+          /* Bleed 3: navy → white walk, lands at 64% (3% before validation 67.3%) */
+          '56.3%':  { backgroundColor: stops[6] },
+          '57.6%':  { backgroundColor: stops[5] },
+          '58.9%':  { backgroundColor: stops[4] },
+          '60.2%':  { backgroundColor: stops[3] },
+          '61.5%':  { backgroundColor: stops[2] },
+          '62.8%':  { backgroundColor: stops[1] },
+          '64%':    { backgroundColor: stops[0] }, /* LANDS before validation 67.3% */
 
           /* Validation through Footer: held white */
           '100%':   { backgroundColor: stops[0] }
