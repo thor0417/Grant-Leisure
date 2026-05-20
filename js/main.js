@@ -848,11 +848,17 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
    STOPS
    8 mathematically interpolated stops from --gl-white to --gl-navy
    (via meyerweb.com/eric/tools/color-blend). Each bleed timeline
-   walks through these in sequence over 100vh of scroll distance.
+   walks through these in sequence over the scroll trigger window.
 
-   CALIBRATION POINTS (adjust here if pacing needs tuning live)
-   - start / end positions on each ScrollTrigger
-   - The 8 hex values are sourced from tokens.css; change them there
+   END POSITION TUNING
+   Bleeds end at 'top 60%' (NOT 'top top'). This means the underlay
+   reaches its target chapter color when the triggering section's
+   top reaches 60% down the viewport -- well before the section's
+   content is centered. Previously ended at 'top top' which meant
+   the bleed was still in progress while the user was reading the
+   section's main content (90% counter visible during white bleed,
+   proof numbers visible during navy bleed). 60% end position lets
+   the color land before content arrives.
    ============================================================ */
 
 if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
@@ -912,22 +918,24 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     /* ----------------------------------------------------------------
        BLEED 1 -- navy → white
        Fires as #logic enters the viewport. Walks stops 8 → 1.
-       Start when Logic's top hits bottom of viewport; end when
-       Logic's top reaches top. One viewport-height of travel.
+       Ends at 'top 60%' -- color lands before the 90% is centered.
        ---------------------------------------------------------------- */
-    buildBleed('#logic', 'top bottom', 'top top', 7, 0);
+    buildBleed('#logic', 'top bottom', 'top 60%', 7, 0);
 
     /* ----------------------------------------------------------------
        BLEED 2 -- white → navy
        Fires as #proof enters the viewport. Walks stops 1 → 8.
+       Ends at 'top 60%' -- color lands before proof numbers start
+       counting up.
        ---------------------------------------------------------------- */
-    buildBleed('#proof', 'top bottom', 'top top', 0, 7);
+    buildBleed('#proof', 'top bottom', 'top 60%', 0, 7);
 
     /* ----------------------------------------------------------------
        BLEED 3 -- navy → white
        Fires as #validation enters the viewport. Walks stops 8 → 1.
+       Ends at 'top 60%' -- color lands before marquee fully arrives.
        ---------------------------------------------------------------- */
-    buildBleed('#validation', 'top bottom', 'top top', 7, 0);
+    buildBleed('#validation', 'top bottom', 'top 60%', 7, 0);
 
     /* Tell ScrollTrigger to recalculate positions once the bleeds are
        wired -- ensures the timelines pick up the correct scroll offsets

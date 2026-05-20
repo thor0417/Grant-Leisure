@@ -28,8 +28,13 @@
 }
 
 .site-nav.is-scrolled {
-  /* Frosted glass -- matches projects.html ghost nav exactly */
-  background: rgba(50, 62, 72, 0.75);
+  /* Frosted glass -- matches projects.html ghost nav exactly.
+     Opacity bumped from 0.75 to 0.88 -- holds contrast during the bleed's
+     mid-grey transition states. White nav text stayed legible on full navy
+     and full white but dipped below WCAG AA when the underlay passed through
+     mid-greys (~rgb(138, 145, 150)). Higher opacity keeps the backdrop
+     reading as navy regardless of what's beneath it. */
+  background: rgba(50, 62, 72, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 2px 24px rgba(0, 0, 0, 0.18); /* Elevation cue -- not decorative */
@@ -290,13 +295,11 @@
    ============================================================= */
 
 #logic {
-  /* Background removed -- section is now transparent so the .page-underlay
-     (see global.css) bleeds through. Logic is part of the WHITE chapter,
-     so the underlay sits at #FFFFFF here. */
-  /* Vertical padding expanded from clamp(3rem, 6vw, 5rem) -- the bleed
-     needs ~100vh of scroll distance to walk through its 8 color stops.
-     Growing Logic gives that travel room while keeping the section visually
-     compressed relative to taller chapters. */
+  /* Background removed -- transparent so .page-underlay bleeds through.
+     Logic is part of the WHITE chapter; underlay sits at #FFFFFF here. */
+  /* Vertical padding expanded -- the bleed needs ~100vh of scroll distance
+     to walk through its 8 color stops. Generous symmetric padding gives
+     travel room above and below the centered content stack. */
   padding: clamp(8rem, 18vw, 14rem) clamp(1.25rem, 5vw, 4rem);
   display: flex;
   align-items: center;
@@ -305,13 +308,22 @@
 .logic-inner {
   max-width: 1200px;
   margin: 0 auto;
+  /* Vertical centered stack -- 90% on top, statement below, tagline below.
+     Restructured from the previous 2-column desktop layout per "Option B":
+     A&I-style centered composition with type doing the work via scale.
+     Mobile inherits this same centered stack -- nothing to override. */
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: clamp(1.5rem, 3vw, 2.5rem);
 }
 .logic-stat {
   font-family: var(--font-header);
-  font-size: clamp(6rem, 16vw, 13rem);
+  /* Scaled up significantly from clamp(6rem, 16vw, 13rem). Now reads as the
+     largest typographic moment in the white chapter. Mobile floor of 8.5rem
+     (136px) keeps it dominant without overflowing a 360px viewport. */
+  font-size: clamp(8.5rem, 22vw, 18rem);
   font-weight: 900;
   line-height: 0.9;
   color: var(--gl-green-vivid);
@@ -320,44 +332,36 @@
   white-space: nowrap;
 }
 .logic-text {
+  /* Vertical inline below the 90%. Both lines centered. */
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 2vw, 1.75rem);
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  align-items: center;
+  max-width: 760px;
 }
 .logic-statement {
   font-family: var(--font-header);
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  /* Scaled up from clamp(1.5rem, 3vw, 2.5rem). Now large enough to carry
+     real weight beneath the 90% without competing with it. */
+  font-size: clamp(2rem, 5vw, 4rem);
   font-weight: 700;
-  line-height: 1.25;
-  color: var(--gl-navy); /* Flipped from white -- Logic now sits in white chapter */
+  line-height: 1.2;
+  color: var(--gl-navy); /* Logic sits in white chapter -- navy text */
   margin: 0;
 }
 .logic-resolve {
   font-family: var(--font-body);
   font-size: var(--text-body-lg);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.6;
-  color: var(--gl-green-vivid);
+  color: var(--gl-navy); /* Flipped from green -- per direction, all Logic body text is dark */
   margin: 0;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-@media (min-width: 768px) {
-  .logic-inner {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(2rem, 3vw, 3rem);
-  }
-  .logic-stat {
-    flex: 0 0 auto;
-    width: clamp(240px, 32vw, 420px);
-  }
-  .logic-text {
-    flex: 1;
-    max-width: 560px;
-  }
-}
+/* No desktop row layout override -- Logic stays a vertical centered stack
+   across all viewports. Removed the previous @media (min-width: 768px) block
+   that split it into 2 columns; that layout fought the new composition. */
 
 
 /* =============================================================
@@ -461,8 +465,10 @@
      Previously hardcoded to #5C9387 (the original brand teal); that color
      is now retired from section-level use. Green lives only as accent
      (buttons, hover states) per the navy/white two-tone composition. */
-  /* Tighter than full section-pad-y -- proof reads as a stats band, not a hero */
-  padding: clamp(2.5rem, 5vw, 4rem) clamp(1.25rem, 5vw, 4rem);
+  /* Compressed padding -- shared token with #validation and #testimonials
+     for consistent rhythm across the three "interstitial" sections. */
+  padding-block: var(--section-pad-y-compressed);
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
 }
 
 .proof-inner {
@@ -915,8 +921,10 @@
 #validation {
   /* Background removed -- transparent so .page-underlay bleeds through.
      Validation opens the final WHITE chapter; underlay sits at #FFFFFF here. */
-  padding-block-start: var(--section-pad-y);
-  padding-block-end: var(--space-xl);
+  /* Compressed padding -- shared token with #proof and #testimonials for
+     consistent rhythm. Symmetrical top/bottom (previously top was
+     --section-pad-y and bottom was --space-xl, creating awkward asymmetry). */
+  padding-block: var(--section-pad-y-compressed);
   overflow: hidden;
 }
 
@@ -1261,12 +1269,16 @@
   /* Background removed -- transparent so .page-underlay bleeds through.
      Testimonials FLIPPED from navy to white chapter; underlay sits at #FFFFFF.
      All white-on-navy text below has been re-tuned for white surface. */
-  /* Elegant strip -- minimal vertical presence, quotes land and move on */
-  padding-block: clamp(2rem, 4vw, 3rem);
+  /* Compressed padding -- shared token with #proof and #validation for
+     consistent rhythm across the three interstitial sections. */
+  padding-block: var(--section-pad-y-compressed);
 }
 
 .testimonials__carousel {
-  max-width: 760px;
+  /* Widened from 760px to 920px -- testimonials previously felt squished
+     on the white underlay. Wider carousel gives quotes room to read as
+     editorial pull-quotes rather than constrained captions. */
+  max-width: 920px;
   margin-inline: auto;
   padding-inline: var(--space-lg);
 }
@@ -1293,8 +1305,11 @@
 .testimonial::before {
   content: '\201C';
   font-family: var(--font-header);
-  /* Reduced from clamp(4rem,6vw,6rem) -- decorative, not focal */
-  font-size: clamp(2rem, 3vw, 2.75rem);
+  /* Bumped from clamp(2rem, 3vw, 2.75rem). Previous size was tuned for navy
+     background where high contrast amplified the visual weight. On white,
+     the green mark needs more scale to register as the editorial opening
+     it's meant to be. */
+  font-size: clamp(3rem, 4vw, 4.5rem);
   line-height: 1;
   color: var(--gl-green-vivid);
   display: block;

@@ -94,6 +94,12 @@
 
 --section-pad-y: clamp(3rem, 6vw, 6rem);
 
+/* Compressed section padding -- used for "interstitial" sections that need
+   to feel like beats, not full chapters. Currently applied to:
+   #proof, #validation, #testimonials. Single shared value so rhythm stays
+   consistent across all three. */
+--section-pad-y-compressed: clamp(2.5rem, 5vw, 4rem);
+
   /* Minimum touch target -- WCAG 2.1 / senior demographic requirement */
   --hit-min: 48px;
 
