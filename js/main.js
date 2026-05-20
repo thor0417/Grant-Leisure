@@ -807,3 +807,131 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     };
   });
 }
+
+/* ============================================================
+   BLEED LAYER -- Continuous tonal bleed (Anton & Irene technique)
+   Last appended block. Nothing above this line is modified.
+
+   ARCHITECTURE
+   The .page-underlay element (defined in index.html, styled in
+   global.css) is a fixed full-viewport div behind all content.
+   Its background-color is the visible page surface. Sections are
+   transparent so the underlay shows through.
+
+   This block wires three GSAP ScrollTrigger timelines that animate
+   the underlay's backgroundColor across scroll position, walking
+   through the --bleed-stop-* values from tokens.css. Lenis already
+   feeds scroll position into GSAP's ticker (line ~449 above), so
+   these timelines inherit the same smooth interpolation.
+
+   The technique mirrors antonandirene.com's .Intro-bg-color pattern
+   (single fixed underlay + scroll-tied RGB color mutation). RGB
+   interpolation via GSAP's default backgroundColor tween produces
+   identical perceptual behavior to their implementation.
+
+   PAGE COMPOSITION (locked)
+   Hero          navy (held, video over dark)
+   ↓ Bleed 1: navy → white as #logic enters
+   Logic         white  (chapter)
+   About         white  (chapter)
+   ↓ Bleed 2: white → navy as #proof enters
+   Proof         navy   (chapter)
+   Reach         navy   (chapter)
+   Expertise     navy   (chapter)
+   ↓ Bleed 3: navy → white as #validation enters
+   Validation    white  (chapter)
+   Leadership    white  (chapter)
+   Testimonials  white  (chapter)
+   Engage        white  (chapter)
+   Footer        white  (chapter, hard close)
+
+   STOPS
+   8 mathematically interpolated stops from --gl-white to --gl-navy
+   (via meyerweb.com/eric/tools/color-blend). Each bleed timeline
+   walks through these in sequence over 100vh of scroll distance.
+
+   CALIBRATION POINTS (adjust here if pacing needs tuning live)
+   - start / end positions on each ScrollTrigger
+   - The 8 hex values are sourced from tokens.css; change them there
+   ============================================================ */
+
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+
+  const pageUnderlay = document.querySelector('.page-underlay');
+  const prefersReducedMotionForBleed = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (pageUnderlay && !prefersReducedMotionForBleed) {
+
+    /* Read stops from tokens.css at runtime. Avoids duplicating hex values
+       in JS -- single source of truth lives in tokens.css. */
+    const computed = getComputedStyle(document.documentElement);
+    const stops = [
+      computed.getPropertyValue('--bleed-stop-1').trim(), /* #FFFFFF */
+      computed.getPropertyValue('--bleed-stop-2').trim(), /* #E2E3E5 */
+      computed.getPropertyValue('--bleed-stop-3').trim(), /* #C4C8CB */
+      computed.getPropertyValue('--bleed-stop-4').trim(), /* #A7ACB1 */
+      computed.getPropertyValue('--bleed-stop-5').trim(), /* #8A9196 */
+      computed.getPropertyValue('--bleed-stop-6').trim(), /* #6D757C */
+      computed.getPropertyValue('--bleed-stop-7').trim(), /* #4F5A62 */
+      computed.getPropertyValue('--bleed-stop-8').trim()  /* #323E48 */
+    ];
+
+    /* Helper: build a multi-stop GSAP timeline that walks the underlay
+       from one chapter color to another through all 8 stops.
+       fromIdx and toIdx are indices into the stops array.
+       trigger / start / end define the scroll window the bleed lives in. */
+    function buildBleed(trigger, start, end, fromIdx, toIdx) {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: trigger,
+          start: start,
+          end: end,
+          scrub: true /* Tied directly to scroll position -- A&I behavior */
+        }
+      });
+
+      /* Determine the stop sequence -- forward or reverse depending on
+         which chapter we're bleeding into. */
+      const sequence = [];
+      if (fromIdx < toIdx) {
+        for (let i = fromIdx; i <= toIdx; i++) sequence.push(stops[i]);
+      } else {
+        for (let i = fromIdx; i >= toIdx; i--) sequence.push(stops[i]);
+      }
+
+      /* Chain each stop as a step in the timeline. GSAP interpolates
+         RGB channels continuously between each pair. */
+      sequence.forEach(function (color, i) {
+        if (i === 0) return; /* Skip first -- it's the starting state */
+        tl.to(pageUnderlay, { backgroundColor: color, ease: 'none' });
+      });
+
+      return tl;
+    }
+
+    /* ----------------------------------------------------------------
+       BLEED 1 -- navy → white
+       Fires as #logic enters the viewport. Walks stops 8 → 1.
+       Start when Logic's top hits bottom of viewport; end when
+       Logic's top reaches top. One viewport-height of travel.
+       ---------------------------------------------------------------- */
+    buildBleed('#logic', 'top bottom', 'top top', 7, 0);
+
+    /* ----------------------------------------------------------------
+       BLEED 2 -- white → navy
+       Fires as #proof enters the viewport. Walks stops 1 → 8.
+       ---------------------------------------------------------------- */
+    buildBleed('#proof', 'top bottom', 'top top', 0, 7);
+
+    /* ----------------------------------------------------------------
+       BLEED 3 -- navy → white
+       Fires as #validation enters the viewport. Walks stops 8 → 1.
+       ---------------------------------------------------------------- */
+    buildBleed('#validation', 'top bottom', 'top top', 7, 0);
+
+    /* Tell ScrollTrigger to recalculate positions once the bleeds are
+       wired -- ensures the timelines pick up the correct scroll offsets
+       even if Lenis hasn't fully settled yet. */
+    ScrollTrigger.refresh();
+  }
+}

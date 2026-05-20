@@ -26,6 +26,27 @@
 
 
   /* ---------------------------------------------------------------------------
+     BLEED UNDERLAY STOPS
+     Mathematically interpolated walk from --gl-white to --gl-navy in RGB space
+     (via meyerweb.com/eric/tools/color-blend). The .page-underlay element
+     (see global.css) animates its background-color through these stops on
+     scroll, producing the A&I-style continuous tonal bleed.
+     Stops are even-spaced so GSAP's RGB interpolation feels temporally uniform.
+     Do not introduce additional hex values here -- adjust scroll triggers
+     in main.js instead if pacing needs tuning.
+  --------------------------------------------------------------------------- */
+
+  --bleed-stop-1:  #FFFFFF; /* white   (chapter: light)              */
+  --bleed-stop-2:  #E2E3E5; /* fog                                   */
+  --bleed-stop-3:  #C4C8CB; /* light slate                           */
+  --bleed-stop-4:  #A7ACB1; /* slate                                 */
+  --bleed-stop-5:  #8A9196; /* mid slate                             */
+  --bleed-stop-6:  #6D757C; /* deep slate                            */
+  --bleed-stop-7:  #4F5A62; /* near navy                             */
+  --bleed-stop-8:  #323E48; /* navy    (chapter: dark, --gl-navy)    */
+
+
+  /* ---------------------------------------------------------------------------
      TYPOGRAPHY
   --------------------------------------------------------------------------- */
 

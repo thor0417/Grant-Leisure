@@ -290,9 +290,14 @@
    ============================================================= */
 
 #logic {
-  background: var(--gl-navy);
-  /* Intentionally compressed -- this is a transition beat, not a full section */
-  padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 4rem);
+  /* Background removed -- section is now transparent so the .page-underlay
+     (see global.css) bleeds through. Logic is part of the WHITE chapter,
+     so the underlay sits at #FFFFFF here. */
+  /* Vertical padding expanded from clamp(3rem, 6vw, 5rem) -- the bleed
+     needs ~100vh of scroll distance to walk through its 8 color stops.
+     Growing Logic gives that travel room while keeping the section visually
+     compressed relative to taller chapters. */
+  padding: clamp(8rem, 18vw, 14rem) clamp(1.25rem, 5vw, 4rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,7 +329,7 @@
   font-size: clamp(1.5rem, 3vw, 2.5rem);
   font-weight: 700;
   line-height: 1.25;
-  color: var(--gl-white);
+  color: var(--gl-navy); /* Flipped from white -- Logic now sits in white chapter */
   margin: 0;
 }
 .logic-resolve {
@@ -362,7 +367,8 @@
    ============================================================= */
 
 #about {
-  background: var(--gl-white);
+  /* Background removed -- transparent so .page-underlay bleeds through.
+     About is part of the WHITE chapter; underlay sits at #FFFFFF here. */
   padding: var(--section-pad-y) clamp(1.25rem, 5vw, 4rem);
 }
 
@@ -450,7 +456,11 @@
    ============================================================= */
 
 #proof {
-  background: #5C9387; /* Hard-coded -- proof section must not follow --gl-green global updates */
+  /* Background removed -- transparent so .page-underlay bleeds through.
+     Proof is part of the NAVY chapter; underlay sits at #323E48 here.
+     Previously hardcoded to #5C9387 (the original brand teal); that color
+     is now retired from section-level use. Green lives only as accent
+     (buttons, hover states) per the navy/white two-tone composition. */
   /* Tighter than full section-pad-y -- proof reads as a stats band, not a hero */
   padding: clamp(2.5rem, 5vw, 4rem) clamp(1.25rem, 5vw, 4rem);
 }
@@ -510,7 +520,9 @@
   line-height: 1;
   color: var(--gl-white);
   letter-spacing: -0.03em;
-  text-shadow: 0 0 8px rgba(92, 147, 135, 0.30);
+  /* Text-shadow removed -- was rgba(92, 147, 135, 0.30), a green glow tuned
+     for the old #5C9387 background. Proof now sits on the navy underlay so
+     a green shadow would read incorrectly. */
 }
 
 .proof-label {
@@ -560,7 +572,8 @@
    ============================================================= */
 
 #reach {
-  background: var(--gl-navy);
+  /* Background removed -- transparent so .page-underlay bleeds through.
+     Reach is part of the NAVY chapter; underlay sits at #323E48 here. */
   padding: var(--section-pad-y) clamp(1.25rem, 5vw, 4rem);
 }
 
@@ -622,7 +635,8 @@
    ============================================================ */
 
 #expertise {
-  background-color: var(--gl-navy);
+  /* Background removed -- transparent so .page-underlay bleeds through.
+     Expertise is part of the NAVY chapter; underlay sits at #323E48 here. */
   padding-block: var(--section-pad-y);
 }
 
@@ -899,7 +913,8 @@
    ============================================================ */
 
 #validation {
-  background-color: var(--gl-white);
+  /* Background removed -- transparent so .page-underlay bleeds through.
+     Validation opens the final WHITE chapter; underlay sits at #FFFFFF here. */
   padding-block-start: var(--section-pad-y);
   padding-block-end: var(--space-xl);
   overflow: hidden;
@@ -1002,10 +1017,11 @@
    ============================================================ */
 
 #leadership {
-  background-color: var(--gl-white);
+  /* Background removed -- transparent so .page-underlay bleeds through.
+     Leadership is part of the WHITE chapter; underlay sits at #FFFFFF here.
+     Top border removed -- no longer separating two white surfaces since
+     #validation also uses the underlay now. */
   padding-block: var(--section-pad-y);
-  /* Top border separates from #validation white surface */
-  border-top: 1px solid rgba(50, 62, 72, 0.10);
 }
 
 .leadership__inner {
@@ -1231,14 +1247,10 @@
   outline-offset: 4px;
 }
 
-/* Testimonials sit on navy -- arrows need light contrast */
-#testimonials .carousel-btn {
-  color: var(--gl-white);
-}
-
-#testimonials .carousel-btn:hover {
-  color: var(--gl-green-vivid);
-}
+/* Testimonials previously sat on navy and required white arrows. The section
+   has been flipped to the white chapter, so arrows revert to navy (matching
+   the .carousel-btn default in this file). Override removed -- no special
+   rule needed. */
 
 /* ============================================================
    #TESTIMONIALS -- Single quote carousel
@@ -1246,7 +1258,9 @@
    ============================================================ */
 
 #testimonials {
-  background-color: var(--gl-navy);
+  /* Background removed -- transparent so .page-underlay bleeds through.
+     Testimonials FLIPPED from navy to white chapter; underlay sits at #FFFFFF.
+     All white-on-navy text below has been re-tuned for white surface. */
   /* Elegant strip -- minimal vertical presence, quotes land and move on */
   padding-block: clamp(2rem, 4vw, 3rem);
 }
@@ -1297,7 +1311,7 @@
   font-family: var(--font-body);
   font-size: var(--text-body-lg);
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(50, 62, 72, 0.85); /* Flipped from white -- testimonials on white underlay */
   margin: 0;
   font-style: italic;
 }
@@ -1312,7 +1326,7 @@
 .testimonial__name {
   font-family: var(--font-header);
   font-size: var(--text-h3);
-  color: var(--gl-white);
+  color: var(--gl-navy); /* Flipped from white -- testimonials on white underlay */
   line-height: 1.2;
 }
 
@@ -1343,7 +1357,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.30);
+  background-color: rgba(50, 62, 72, 0.25); /* Flipped from white -- testimonials on white underlay */
   border: none;
   cursor: pointer;
   transition: background-color var(--duration-fast) var(--ease-stellar);
@@ -1367,7 +1381,7 @@
 .testimonial__company {
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  color: var(--gl-white) !important; /* Overrides body color inherited from global.css */
+  color: var(--gl-navy) !important; /* Flipped from white -- testimonials on white underlay. !important overrides body color inherited from global.css */
   opacity: 0.6;
   letter-spacing: 0.04em;
 }
@@ -1377,9 +1391,11 @@
    White surface. Two-column desktop. Copy left, form right.
    ============================================================ */
 #engage {
-  background-color: var(--gl-white);
+  /* Background removed -- transparent so .page-underlay bleeds through.
+     Engage is part of the WHITE chapter; underlay sits at #FFFFFF here.
+     Top border removed -- no longer separating two surfaces since
+     #testimonials also uses the underlay now. */
   padding-block: var(--section-pad-y);
-  border-top: 1px solid rgba(50, 62, 72, 0.12);
 }
 .engage__inner {
   max-width: 1200px;
@@ -1539,10 +1555,11 @@
    ============================================================ */
 
 #footer {
-  background-color: var(--gl-navy);
+  /* FLIPPED from navy to white chapter -- footer now closes the page on white.
+     Background removed -- transparent so .page-underlay bleeds through at
+     #FFFFFF. Top border removed (no surface change between engage and footer
+     now that both sit on the white underlay). */
   padding-block: var(--space-lg);
-  /* Top border separates footer from engage green */
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .footer__inner {
@@ -1557,7 +1574,7 @@
 .footer__legal {
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  color: rgba(255, 255, 255, 0.50);
+  color: rgba(50, 62, 72, 0.50); /* Flipped from white-at-50% to navy-at-50% for white underlay */
   text-align: center;
   margin: 0;
   letter-spacing: 0.05em;

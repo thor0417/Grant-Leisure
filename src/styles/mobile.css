@@ -46,11 +46,25 @@
   /* Triple-layer navy backstop. iOS Safari and Brave Mobile expose different
      background layers depending on dynamic-viewport state. Setting html, body,
      and #hero all navy ensures whichever layer the browser exposes through
-     the chrome zone is filled. All white sections (#about, #validation,
-     #leadership, #engage) own explicit white backgrounds in components.css
-     so the body navy doesn't leak into them. */
+     the chrome zone is filled.
+
+     With the .page-underlay bleed system live (see global.css and main.js),
+     sections are now transparent and the underlay is the authoritative
+     surface. Body navy here is a fallback only -- visible only in the brief
+     moment before GSAP wires the underlay, and as a backstop if any layer
+     above leaks transparency. The underlay sits at z-index: -1 above body,
+     so once it paints, body navy is hidden.
+
+     Defensive .page-underlay rule below ensures the underlay itself starts
+     at navy on mobile too, matching the desktop initial state. */
   html,
   body {
+    background-color: var(--gl-navy);
+  }
+
+  .page-underlay {
+    /* Defensive: same initial state as desktop. main.js animates this
+       through the --bleed-stop-* values on scroll. */
     background-color: var(--gl-navy);
   }
 

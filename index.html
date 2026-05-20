@@ -17,6 +17,14 @@
 
 <body>
 
+  <!-- PAGE UNDERLAY -- continuous tonal bleed canvas.
+       Fixed full-viewport element behind all content. Its background-color
+       is animated by main.js (see "BLEED LAYER" block) via 3 GSAP
+       ScrollTrigger timelines, walking through the --bleed-stop-* values
+       from tokens.css as the visitor scrolls between chapters.
+       Decorative -- aria-hidden + pointer-events: none in global.css. -->
+  <div class="page-underlay" aria-hidden="true"></div>
+
   <!-- NAV -->
   <header class="site-nav" role="banner">
     <nav class="nav-inner" aria-label="Primary navigation">

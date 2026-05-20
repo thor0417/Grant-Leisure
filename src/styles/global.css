@@ -35,7 +35,11 @@ html {
 
 body {
   min-height: 100vh;
-  background-color: var(--gl-white);
+  /* Navy default -- the .page-underlay (see section 14 below) sits above body
+     and renders the visible page background. Setting body navy ensures any
+     uncovered area on load matches the hero's implied dark world, eliminating
+     a brief white flash before the underlay paints. */
+  background-color: var(--gl-navy);
 
   /* Prevent horizontal overflow from marquee or wide elements */
   overflow-x: hidden;
@@ -476,4 +480,41 @@ body.is-loading [data-reveal="right"],
 body.is-loading [data-reveal="scale"] {
   /* Hold hidden state until GSAP initialises -- prevents layout flash */
   visibility: hidden;
+}
+
+
+/* --------------------------------------------------------------------------
+   14. PAGE UNDERLAY -- BLEED CANVAS
+   A single fixed full-viewport element that sits behind every section. Its
+   background-color is animated by main.js via three GSAP ScrollTrigger
+   timelines (see main.js "BLEED LAYER" block), walking through the
+   --bleed-stop-* values from tokens.css as the visitor scrolls.
+
+   Sections themselves are transparent (see components.css overrides) so the
+   underlay shows through and the page reads as one continuous tonal surface.
+
+   z-index: -1 -- behind every section, ahead of body background.
+   Matches the architectural pattern used by antonandirene.com (their
+   equivalent class is .Intro-bg-color, z-index: -7).
+
+   The 'will-change' hint promotes the layer to its own GPU compositor pass
+   so the continuous backgroundColor scrub doesn't repaint the whole page.
+   -------------------------------------------------------------------------- */
+
+.page-underlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--gl-navy); /* Initial state -- matches hero implied tone */
+  will-change: background-color;
+  pointer-events: none; /* Never intercepts clicks -- decorative only */
+}
+
+/* Reduced motion: skip the bleed entirely. The underlay holds navy under
+   the hero and the white sections own their own white backgrounds (see
+   components.css). The page reverts to its pre-bleed appearance. */
+@media (prefers-reduced-motion: reduce) {
+  .page-underlay {
+    background-color: var(--gl-white);
+  }
 }
