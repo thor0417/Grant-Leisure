@@ -973,32 +973,36 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
        ================================================================ */
     bleedMM.add('(max-width: 767px)', function () {
 
-      /* DIAGNOSTIC: log the scroll distance GSAP is measuring. If this prints
-         a number in the thousands, the timeline has proper scroll distance
-         to work with. If it prints ~0 or equal to viewport height, the page
-         body height is collapsed at measurement time (the bug Gemini
-         diagnosed). Remove this block once mobile bleed is verified working. */
+      /* DIAGNOSTIC: log the scroll distance GSAP is measuring. After this
+         fix, the value should be a number in the thousands (the actual
+         scrollable page distance). Previous attempt printed 812 (= viewport
+         height), confirming Gemini's diagnosis that trigger-based height
+         measurement was collapsing. The 'end: max' pattern below reads
+         scroll distance directly from the browser scroll engine instead. */
       ScrollTrigger.create({
-        trigger: document.documentElement,
-        start: 'top top',
-        end: 'bottom bottom',
+        start: 0,
+        end: 'max',
         onRefresh: function (self) {
-          console.log('[BLEED] Mobile scroll distance:', Math.round(self.end - self.start), 'px');
+          console.log('[BLEED] Mobile scroll distance:', Math.round(self.end - self.start), 'px (should be in thousands)');
         }
       });
 
       gsap.timeline({
         scrollTrigger: {
-          /* Trigger is documentElement (the <html> element), NOT document.body.
-             documentElement is the actual scrolling root in mobile browsers
-             and reports stable scrollHeight regardless of body overflow rules.
-             Using body as the trigger here was reading height as ~0px on mobile,
-             collapsing the entire timeline into the first few pixels of scroll. */
-          trigger: document.documentElement,
-          start: 'top top',
-          end: 'bottom bottom',
+          /* No 'trigger' property -- using start:0 + end:'max' instead.
+             This is GSAP's documented pattern for full-page scroll progress
+             timelines. 'max' reads document.documentElement.scrollHeight
+             minus window.innerHeight directly from the browser scroll
+             engine, completely bypassing trigger element height measurement.
+             Previous attempt using trigger:documentElement with
+             start:'top top' end:'bottom bottom' was reading the trigger
+             element's own height (812px = viewport) instead of the actual
+             scrollable distance, causing the timeline to collapse into
+             the first few pixels of scroll. */
+          start: 0,
+          end: 'max',
           scrub: true,
-          invalidateOnRefresh: true /* Critical: recalculate on every viewport change */
+          invalidateOnRefresh: true /* Recalculate on every viewport change (address bar, rotation) */
         }
       }).to(pageUnderlay, {
         ease: 'none',

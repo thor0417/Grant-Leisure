@@ -53,20 +53,15 @@
      surface. Body navy here is a fallback only -- visible only in the brief
      moment before GSAP wires the underlay, and as a backstop if any layer
      above leaks transparency. The underlay sits at z-index: -1 above body,
-     so once it paints, body navy is hidden.
-
-     Defensive .page-underlay rule below ensures the underlay itself starts
-     at navy on mobile too, matching the desktop initial state. */
+     so once it paints, body navy is hidden. */
   html,
   body {
     background-color: var(--gl-navy);
   }
 
-  .page-underlay {
-    /* Defensive: same initial state as desktop. main.js animates this
-       through the --bleed-stop-* values on scroll. */
-    background-color: var(--gl-navy);
-  }
+  /* Note: previous defensive .page-underlay rule removed -- inline style
+     mutations from GSAP correctly override CSS, so the rule was dead code.
+     Underlay starts at navy via main.js initial state. */
 
   #hero {
     background-color: var(--gl-navy);

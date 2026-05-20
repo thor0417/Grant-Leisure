@@ -298,12 +298,14 @@
   /* Background removed -- transparent so .page-underlay bleeds through.
      Logic is part of the WHITE chapter; underlay sits at #FFFFFF here. */
   /* Asymmetric padding: large top, medium bottom.
-     The bleed needs ~100vh of scroll distance above the content for the
-     navy → white walk to be visible. Large top padding gives the user
-     scroll room to watch the underlay change. Bottom is half the top
-     because once content lands, the user wants to keep moving toward
-     About -- excess bottom space reads as empty/floating. */
-  padding-block-start: clamp(14rem, 28vw, 22rem);
+     The bleed needs visible travel room above the content for the
+     navy → white walk. Top padding gives the user scroll room to watch
+     the underlay change. Bottom is smaller because once content lands,
+     the user wants to keep moving toward About -- excess bottom space
+     reads as empty/floating.
+     Top reduced from clamp(14rem, 28vw, 22rem) -- previous value left
+     nearly a full viewport of dead white space before 90% arrived. */
+  padding-block-start: clamp(10rem, 20vw, 16rem);
   padding-block-end: clamp(7rem, 14vw, 11rem);
   padding-inline: clamp(1.25rem, 5vw, 4rem);
   display: flex;
