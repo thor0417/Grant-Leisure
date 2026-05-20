@@ -1060,19 +1060,23 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
                 expertise:  57.0%
                 validation: 67.3%
 
-             Transitions are TIGHT (2% windows) rather than gradual
-             dissolves. Mobile fast-scroll burns through any longer
-             window before the timeline catches up, leaving visible
-             wrong colors. Sharp transitions guarantee the correct
-             chapter color is settled at every section boundary. */
-          '0%':   { backgroundColor: stops[7] }, /* navy  -- hero start */
-          '13%':  { backgroundColor: stops[7] }, /* navy  -- hold */
-          '15%':  { backgroundColor: stops[0] }, /* white -- LOGIC at 14.3% */
-          '35%':  { backgroundColor: stops[0] }, /* white -- hold */
-          '38%':  { backgroundColor: stops[7] }, /* navy  -- PROOF at 37.2% */
-          '65%':  { backgroundColor: stops[7] }, /* navy  -- hold */
-          '68%':  { backgroundColor: stops[0] }, /* white -- VALIDATION at 67.3% */
-          '100%': { backgroundColor: stops[0] }  /* white -- footer */
+             Each bleed walks across a 9% scroll window for a smooth visible
+             dissolve. The END of each bleed lands at the target section's
+             scroll position so the chapter color is settled when content
+             arrives. The START is 9% earlier, giving the underlay time to
+             walk visibly between chapter colors as the user scrolls.
+
+             On a ~6000px page, 9% of scroll = ~540px of finger travel per
+             transition, which is plenty for the eye to perceive a smooth
+             continuous fade rather than a snap. */
+          '0%':   { backgroundColor: stops[7] }, /* navy  -- hero start            */
+          '5%':   { backgroundColor: stops[7] }, /* navy  -- hold to before Logic  */
+          '14%':  { backgroundColor: stops[0] }, /* white -- settled AT logic 14.3 */
+          '28%':  { backgroundColor: stops[0] }, /* white -- hold to before Proof  */
+          '37%':  { backgroundColor: stops[7] }, /* navy  -- settled AT proof 37.2 */
+          '58%':  { backgroundColor: stops[7] }, /* navy  -- hold to before Valid  */
+          '67%':  { backgroundColor: stops[0] }, /* white -- settled AT valid 67.3 */
+          '100%': { backgroundColor: stops[0] }  /* white -- hold to footer        */
         }
       });
 
