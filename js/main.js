@@ -1042,38 +1042,37 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
           trigger: document.documentElement,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 0.5, /* Soft catchup for touch decelerations */
+          /* scrub: true (NOT 0.5). Previously had scrub:0.5 for "soft
+             catchup" but it caused visible wrong-color lag on mobile fast
+             scroll -- the bleed was still mid-walk because the 0.5s catchup
+             hadn't completed by the time the user landed on a new section.
+             Pure scrub:true = instant tie to scroll position, no lag. */
+          scrub: true,
           invalidateOnRefresh: true
         }
       }).to(pageUnderlay, {
         ease: 'none',
         keyframes: {
-          /* Percentages calibrated to ACTUAL section scroll positions
-             measured from the live mobile page at 390px viewport:
-                hero:        0.0%
-                logic:       14.3%
-                about:       21.9%
-                proof:       37.2%
-                reach:       50.0%
-                expertise:   57.0%
-                validation:  67.3%
-                leadership:  71.6%
-                testimonials:86.3%
-                engage:      94.5%
-             Each bleed COMPLETES at the target section's boundary so the
-             chapter color is fully settled when the section enters. This
-             is the mobile equivalent of desktop's 'top 60%' end position.
-             Previously the bleeds were ending AFTER the section started,
-             causing visible content to display on the wrong chapter color
-             (e.g. marquee landing on navy because Bleed 3 was still mid-walk). */
-          '0%':   { backgroundColor: stops[7] }, /* navy  -- hero start          */
-          '8%':   { backgroundColor: stops[7] }, /* navy  -- hold to before logic*/
-          '14%':  { backgroundColor: stops[0] }, /* white -- settled AT logic    */
-          '30%':  { backgroundColor: stops[0] }, /* white -- hold to before proof*/
-          '37%':  { backgroundColor: stops[7] }, /* navy  -- settled AT proof    */
-          '60%':  { backgroundColor: stops[7] }, /* navy  -- hold to before valid*/
-          '67%':  { backgroundColor: stops[0] }, /* white -- settled AT validation*/
-          '100%': { backgroundColor: stops[0] }  /* white -- hold to footer      */
+          /* Percentages calibrated to ACTUAL measured section positions:
+                logic:      14.3%
+                about:      21.9%
+                proof:      37.2%
+                expertise:  57.0%
+                validation: 67.3%
+
+             Transitions are TIGHT (2% windows) rather than gradual
+             dissolves. Mobile fast-scroll burns through any longer
+             window before the timeline catches up, leaving visible
+             wrong colors. Sharp transitions guarantee the correct
+             chapter color is settled at every section boundary. */
+          '0%':   { backgroundColor: stops[7] }, /* navy  -- hero start */
+          '13%':  { backgroundColor: stops[7] }, /* navy  -- hold */
+          '15%':  { backgroundColor: stops[0] }, /* white -- LOGIC at 14.3% */
+          '35%':  { backgroundColor: stops[0] }, /* white -- hold */
+          '38%':  { backgroundColor: stops[7] }, /* navy  -- PROOF at 37.2% */
+          '65%':  { backgroundColor: stops[7] }, /* navy  -- hold */
+          '68%':  { backgroundColor: stops[0] }, /* white -- VALIDATION at 67.3% */
+          '100%': { backgroundColor: stops[0] }  /* white -- footer */
         }
       });
 
