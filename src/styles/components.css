@@ -297,10 +297,15 @@
 #logic {
   /* Background removed -- transparent so .page-underlay bleeds through.
      Logic is part of the WHITE chapter; underlay sits at #FFFFFF here. */
-  /* Vertical padding expanded -- the bleed needs ~100vh of scroll distance
-     to walk through its 8 color stops. Generous symmetric padding gives
-     travel room above and below the centered content stack. */
-  padding: clamp(8rem, 18vw, 14rem) clamp(1.25rem, 5vw, 4rem);
+  /* Asymmetric padding: large top, medium bottom.
+     The bleed needs ~100vh of scroll distance above the content for the
+     navy → white walk to be visible. Large top padding gives the user
+     scroll room to watch the underlay change. Bottom is half the top
+     because once content lands, the user wants to keep moving toward
+     About -- excess bottom space reads as empty/floating. */
+  padding-block-start: clamp(14rem, 28vw, 22rem);
+  padding-block-end: clamp(7rem, 14vw, 11rem);
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -320,11 +325,12 @@
 }
 .logic-stat {
   font-family: var(--font-header);
-  /* Reduced from clamp(8.5rem, 22vw, 18rem) -- previously larger than the
-     hero headline (clamp(3.25rem, 8vw + 1rem, 7.5rem) = max 7.5rem), which
-     felt off. Now sized just under hero max so the 90% reads as a strong
-     second beat without eclipsing the page opener. */
-  font-size: clamp(5rem, 14vw, 7rem);
+  /* Sized between hero (clamp max 7.5rem = 120px) and supporting text
+     (statement max 4rem = 64px). Numerals read slightly smaller than
+     letters at same point size, so the 90% can run larger than hero max
+     without visually exceeding it. Max 11rem = 176px on desktop. Mobile
+     floor 6.5rem = 104px keeps it dominant on phones. */
+  font-size: clamp(6.5rem, 18vw, 11rem);
   font-weight: 900;
   line-height: 0.9;
   color: var(--gl-green-vivid);

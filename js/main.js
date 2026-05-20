@@ -973,9 +973,28 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
        ================================================================ */
     bleedMM.add('(max-width: 767px)', function () {
 
+      /* DIAGNOSTIC: log the scroll distance GSAP is measuring. If this prints
+         a number in the thousands, the timeline has proper scroll distance
+         to work with. If it prints ~0 or equal to viewport height, the page
+         body height is collapsed at measurement time (the bug Gemini
+         diagnosed). Remove this block once mobile bleed is verified working. */
+      ScrollTrigger.create({
+        trigger: document.documentElement,
+        start: 'top top',
+        end: 'bottom bottom',
+        onRefresh: function (self) {
+          console.log('[BLEED] Mobile scroll distance:', Math.round(self.end - self.start), 'px');
+        }
+      });
+
       gsap.timeline({
         scrollTrigger: {
-          trigger: document.body,
+          /* Trigger is documentElement (the <html> element), NOT document.body.
+             documentElement is the actual scrolling root in mobile browsers
+             and reports stable scrollHeight regardless of body overflow rules.
+             Using body as the trigger here was reading height as ~0px on mobile,
+             collapsing the entire timeline into the first few pixels of scroll. */
+          trigger: document.documentElement,
           start: 'top top',
           end: 'bottom bottom',
           scrub: true,

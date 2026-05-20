@@ -33,6 +33,15 @@ html {
   scroll-behavior: auto;
 }
 
+/* Horizontal overflow containment on <html> ONLY -- never on <body>.
+   Body overflow-x:hidden was breaking GSAP ScrollTrigger height measurement
+   on mobile (caused bleed timeline to collapse into ~5px). Per CSS spec,
+   overflow on <html> establishes a horizontal containment without disrupting
+   the body's scroll height calculation that ScrollTrigger depends on. */
+html {
+  overflow-x: hidden;
+}
+
 body {
   min-height: 100vh;
   /* Navy default -- the .page-underlay (see section 14 below) sits above body
@@ -40,9 +49,7 @@ body {
      uncovered area on load matches the hero's implied dark world, eliminating
      a brief white flash before the underlay paints. */
   background-color: var(--gl-navy);
-
-  /* Prevent horizontal overflow from marquee or wide elements */
-  overflow-x: hidden;
+  /* overflow-x removed from body -- see <html> rule above for explanation. */
 }
 
 /* Images and media are block by default -- eliminates inline baseline gap */
