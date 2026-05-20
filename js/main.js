@@ -1060,17 +1060,19 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
                 leadership:  71.6%
                 testimonials:86.3%
                 engage:      94.5%
-                footer:     112.9%
-             Each transition completes ~3-5% BEFORE the target section
-             enters, so the chapter color is settled when the content
-             arrives -- same principle as desktop's 'top 60%' end. */
+             Each bleed COMPLETES at the target section's boundary so the
+             chapter color is fully settled when the section enters. This
+             is the mobile equivalent of desktop's 'top 60%' end position.
+             Previously the bleeds were ending AFTER the section started,
+             causing visible content to display on the wrong chapter color
+             (e.g. marquee landing on navy because Bleed 3 was still mid-walk). */
           '0%':   { backgroundColor: stops[7] }, /* navy  -- hero start          */
-          '12%':  { backgroundColor: stops[7] }, /* navy  -- hold to logic at 14 */
-          '18%':  { backgroundColor: stops[0] }, /* white -- before logic centers*/
-          '35%':  { backgroundColor: stops[0] }, /* white -- hold to proof at 37 */
-          '44%':  { backgroundColor: stops[7] }, /* navy  -- before proof centers*/
-          '62%':  { backgroundColor: stops[7] }, /* navy  -- hold to valid at 67 */
-          '72%':  { backgroundColor: stops[0] }, /* white -- before valid centers*/
+          '8%':   { backgroundColor: stops[7] }, /* navy  -- hold to before logic*/
+          '14%':  { backgroundColor: stops[0] }, /* white -- settled AT logic    */
+          '30%':  { backgroundColor: stops[0] }, /* white -- hold to before proof*/
+          '37%':  { backgroundColor: stops[7] }, /* navy  -- settled AT proof    */
+          '60%':  { backgroundColor: stops[7] }, /* navy  -- hold to before valid*/
+          '67%':  { backgroundColor: stops[0] }, /* white -- settled AT validation*/
           '100%': { backgroundColor: stops[0] }  /* white -- hold to footer      */
         }
       });
