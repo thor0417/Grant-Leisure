@@ -40,16 +40,24 @@ html {
    the body's scroll height calculation that ScrollTrigger depends on. */
 html {
   overflow-x: hidden;
+  /* Navy fallback -- the .page-underlay (z-index: -1) sits ABOVE html but
+     BELOW body in the stacking context. Setting html navy provides the
+     dark fallback visible in iOS Safari address bar zones and during the
+     brief moment before GSAP wires the underlay. Body itself must remain
+     transparent so the underlay (which has z-index -1, below body) can
+     still be visible through body. */
+  background-color: var(--gl-navy);
 }
 
 body {
   min-height: 100vh;
-  /* Navy default -- the .page-underlay (see section 14 below) sits above body
-     and renders the visible page background. Setting body navy ensures any
-     uncovered area on load matches the hero's implied dark world, eliminating
-     a brief white flash before the underlay paints. */
-  background-color: var(--gl-navy);
-  /* overflow-x removed from body -- see <html> rule above for explanation. */
+  /* Body MUST be transparent. The .page-underlay div has z-index: -1 which
+     places it BEHIND body in the stacking context. If body has any solid
+     background-color, it blocks the underlay from view entirely -- the
+     entire bleed system fails because body's color is what's visible, not
+     the underlay's animated color. Navy fallback lives on <html> above. */
+  background-color: transparent;
+  /* overflow-x lives on <html> -- see rule above */
 }
 
 /* Images and media are block by default -- eliminates inline baseline gap */

@@ -43,19 +43,17 @@
      before the hero video paints
      ====================================================================== */
 
-  /* Triple-layer navy backstop. iOS Safari and Brave Mobile expose different
-     background layers depending on dynamic-viewport state. Setting html, body,
-     and #hero all navy ensures whichever layer the browser exposes through
-     the chrome zone is filled.
+  /* iOS Safari and Brave Mobile expose different background layers depending
+     on dynamic-viewport state. Setting <html> navy fills whichever layer the
+     browser exposes through the chrome zone.
 
-     With the .page-underlay bleed system live (see global.css and main.js),
-     sections are now transparent and the underlay is the authoritative
-     surface. Body navy here is a fallback only -- visible only in the brief
-     moment before GSAP wires the underlay, and as a backstop if any layer
-     above leaks transparency. The underlay sits at z-index: -1 above body,
-     so once it paints, body navy is hidden. */
-  html,
-  body {
+     CRITICAL: <body> must NOT have a background color on mobile. The
+     .page-underlay div has z-index: -1, which places it BEHIND body in the
+     stacking context. If body has any solid background-color, it completely
+     blocks the underlay from view -- the bleed animates correctly on the
+     underlay, but body's solid color is what's visible to the user, not
+     the underlay. Body stays transparent (inherited from global.css). */
+  html {
     background-color: var(--gl-navy);
   }
 
