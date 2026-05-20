@@ -556,21 +556,34 @@ if (revealElements.length && typeof gsap !== 'undefined') {
    JS FIX 1 -- Reusable swipe binding
    Touchstart/touchend delta with 50px threshold. Passive
    listeners -- no scroll-locking, never blocks the timeline.
+
+   GUARDED against vertical scrolls: requires horizontal delta
+   to exceed vertical delta AND exceed the threshold. Without
+   this, a normal downward scroll with slight horizontal drift
+   (very common on mobile) registered as a swipe and advanced
+   the carousel. Result: team carousel jumped to Edmund's card
+   just from the user scrolling vertically into the section.
+
    Wired to every mobile carousel below.
    ------------------------------------------------------------ */
 function addSwipeSupport(container, onSwipeLeft, onSwipeRight) {
   if (!container) return;
   let startX = 0;
+  let startY = 0;
   const threshold = 50;
 
   container.addEventListener('touchstart', function (e) {
     startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
   }, { passive: true });
 
   container.addEventListener('touchend', function (e) {
-    const delta = startX - e.changedTouches[0].clientX;
-    if (Math.abs(delta) < threshold) return;
-    if (delta > 0) {
+    const deltaX = startX - e.changedTouches[0].clientX;
+    const deltaY = startY - e.changedTouches[0].clientY;
+    /* Bail if vertical movement dominates -- this was a scroll, not a swipe */
+    if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+    if (Math.abs(deltaX) < threshold) return;
+    if (deltaX > 0) {
       onSwipeLeft();
     } else {
       onSwipeRight();
@@ -642,8 +655,15 @@ function addSwipeSupport(container, onSwipeLeft, onSwipeRight) {
   /* Kill any GSAP ScrollTriggers attached to bento cards and strip the
      inline opacity/transform GSAP slammed onto them. Without this, all six
      cards render simultaneously on mobile because GSAP's inline opacity:1
-     beats our CSS. Runs every time the carousel mounts. */
+     beats our CSS. Runs every time the carousel mounts.
+
+     GUARDED to mobile viewport only: if this function ever fires while
+     the window is at desktop width (e.g. window resized across the
+     breakpoint after mount was already triggered), it would nuke the
+     desktop bento's GSAP-applied opacity:1 and leave the cards invisible
+     until page refresh. Bail early on desktop to prevent that. */
   function purgeGsapStateFromCards() {
+    if (window.innerWidth > MOBILE_MAX) return;
     if (typeof ScrollTrigger !== 'undefined') {
       ScrollTrigger.getAll().forEach(function (st) {
         if (st.trigger && st.trigger.classList && st.trigger.classList.contains('bento__card')) {

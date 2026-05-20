@@ -33,16 +33,17 @@ html {
   scroll-behavior: auto;
 }
 
-/* No overflow rules on <html> or <body>.
-   Previously had overflow-x:hidden on <html> as a belt-and-suspenders
-   horizontal containment, but mobile WebKit (iOS Safari/Brave/Chrome -- all
-   forced to WebKit on iOS) treats overflow on <html> as breaking position:
-   fixed and position: sticky on descendants. Result: the projects nav and
-   category pill bar drift down the page on real mobile devices instead
-   of staying anchored to the viewport top.
-   The marquee (.marquee) and other potentially-overflowing components
-   already have their own overflow: hidden, so removing the global
-   html-level rule doesn't cause horizontal scroll regressions. */
+/* Selective html overflow strategy:
+   - Mobile (max-width: 767px): NO overflow rule on <html>. Mobile WebKit
+     (iOS Safari/Brave/Chrome -- all forced to WebKit on iOS) treats
+     overflow on <html> as breaking position:fixed and position:sticky on
+     descendants, causing the projects nav to drift down the page.
+   - Desktop (min-width: 768px): overflow-x: hidden RESTORED. On desktop,
+     position:fixed works correctly with html overflow, AND the rule
+     protects against horizontal scroll flicker on projects.html caused
+     by some content element exceeding viewport width during scroll.
+   The marquee and other potentially-overflowing components have their
+   own overflow: hidden, so the html-level rule is belt-and-suspenders. */
 html {
   /* Navy fallback -- the .page-underlay (z-index: -1) sits ABOVE html but
      BELOW body in the stacking context. Setting html navy provides the
@@ -50,6 +51,12 @@ html {
      brief moment before GSAP wires the underlay. Body itself must remain
      transparent so the underlay (z-index: -1, below body) shows through. */
   background-color: var(--gl-navy);
+}
+
+@media (min-width: 768px) {
+  html {
+    overflow-x: hidden;
+  }
 }
 
 body {
