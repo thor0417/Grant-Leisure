@@ -1048,14 +1048,30 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
       }).to(pageUnderlay, {
         ease: 'none',
         keyframes: {
-          '0%':   { backgroundColor: stops[7] }, /* navy   -- hero */
-          '12%':  { backgroundColor: stops[7] }, /* navy   -- hero end */
-          '20%':  { backgroundColor: stops[0] }, /* white  -- logic enters */
-          '40%':  { backgroundColor: stops[0] }, /* white  -- about end */
-          '48%':  { backgroundColor: stops[7] }, /* navy   -- proof enters */
-          '68%':  { backgroundColor: stops[7] }, /* navy   -- expertise end */
-          '76%':  { backgroundColor: stops[0] }, /* white  -- validation enters */
-          '100%': { backgroundColor: stops[0] }  /* white  -- footer */
+          /* Percentages calibrated to ACTUAL section scroll positions
+             measured from the live mobile page at 390px viewport:
+                hero:        0.0%
+                logic:       14.3%
+                about:       21.9%
+                proof:       37.2%
+                reach:       50.0%
+                expertise:   57.0%
+                validation:  67.3%
+                leadership:  71.6%
+                testimonials:86.3%
+                engage:      94.5%
+                footer:     112.9%
+             Each transition completes ~3-5% BEFORE the target section
+             enters, so the chapter color is settled when the content
+             arrives -- same principle as desktop's 'top 60%' end. */
+          '0%':   { backgroundColor: stops[7] }, /* navy  -- hero start          */
+          '12%':  { backgroundColor: stops[7] }, /* navy  -- hold to logic at 14 */
+          '18%':  { backgroundColor: stops[0] }, /* white -- before logic centers*/
+          '35%':  { backgroundColor: stops[0] }, /* white -- hold to proof at 37 */
+          '44%':  { backgroundColor: stops[7] }, /* navy  -- before proof centers*/
+          '62%':  { backgroundColor: stops[7] }, /* navy  -- hold to valid at 67 */
+          '72%':  { backgroundColor: stops[0] }, /* white -- before valid centers*/
+          '100%': { backgroundColor: stops[0] }  /* white -- hold to footer      */
         }
       });
 

@@ -382,7 +382,14 @@
 #about {
   /* Background removed -- transparent so .page-underlay bleeds through.
      About is part of the WHITE chapter; underlay sits at #FFFFFF here. */
-  padding: var(--section-pad-y) clamp(1.25rem, 5vw, 4rem);
+  /* Asymmetric padding: standard top, expanded bottom.
+     About is the last section of the white chapter -- the expanded bottom
+     gives the white → navy bleed (Bleed 2) visible scroll distance to walk
+     through all 8 stops before Proof arrives. Without this, the chapter
+     transition feels abrupt because the sections are pressed together. */
+  padding-block-start: var(--section-pad-y);
+  padding-block-end: clamp(8rem, 16vw, 13rem);
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
 }
 
 .about-inner {
@@ -659,7 +666,14 @@
 #expertise {
   /* Background removed -- transparent so .page-underlay bleeds through.
      Expertise is part of the NAVY chapter; underlay sits at #323E48 here. */
-  padding-block: var(--section-pad-y);
+  /* Asymmetric padding: standard top, expanded bottom.
+     Expertise is the last section of the navy chapter -- the expanded
+     bottom gives the navy → white bleed (Bleed 3) visible scroll distance
+     to walk through all 8 stops before Validation/marquee arrives. Same
+     value as #about's bottom padding for consistent chapter-transition
+     rhythm across both bleeds. */
+  padding-block-start: var(--section-pad-y);
+  padding-block-end: clamp(8rem, 16vw, 13rem);
 }
 
 .expertise__inner {
