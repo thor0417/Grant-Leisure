@@ -1053,30 +1053,64 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
       }).to(pageUnderlay, {
         ease: 'none',
         keyframes: {
-          /* Percentages calibrated to ACTUAL measured section positions:
+          /* MOBILE BLEED MAP -- Full 8-stop walks matching desktop buildBleed.
+             
+             Section scroll positions (measured from live mobile page):
                 logic:      14.3%
-                about:      21.9%
                 proof:      37.2%
-                expertise:  57.0%
                 validation: 67.3%
+             
+             Each chapter transition walks through ALL 8 stops (same as
+             desktop). The 8-stop walk gives mobile the same perceptual
+             feel as desktop's chained buildBleed tweens -- intermediate
+             tonal anchors at each stop, not just linear endpoint-to-endpoint
+             interpolation.
+             
+             Each transition window is 9% of scroll. Stops are spaced
+             evenly within each window so the walk feels continuous. The
+             end of each transition lands exactly at the target section.
+             Note: GSAP keyframes use unique percentage keys -- no two
+             keys can be the same percentage. */
 
-             Each bleed walks across a 9% scroll window for a smooth visible
-             dissolve. The END of each bleed lands at the target section's
-             scroll position so the chapter color is settled when content
-             arrives. The START is 9% earlier, giving the underlay time to
-             walk visibly between chapter colors as the user scrolls.
+          /* Hero: held navy */
+          '0%':     { backgroundColor: stops[7] },
 
-             On a ~6000px page, 9% of scroll = ~540px of finger travel per
-             transition, which is plenty for the eye to perceive a smooth
-             continuous fade rather than a snap. */
-          '0%':   { backgroundColor: stops[7] }, /* navy  -- hero start            */
-          '5%':   { backgroundColor: stops[7] }, /* navy  -- hold to before Logic  */
-          '14%':  { backgroundColor: stops[0] }, /* white -- settled AT logic 14.3 */
-          '28%':  { backgroundColor: stops[0] }, /* white -- hold to before Proof  */
-          '37%':  { backgroundColor: stops[7] }, /* navy  -- settled AT proof 37.2 */
-          '58%':  { backgroundColor: stops[7] }, /* navy  -- hold to before Valid  */
-          '67%':  { backgroundColor: stops[0] }, /* white -- settled AT valid 67.3 */
-          '100%': { backgroundColor: stops[0] }  /* white -- hold to footer        */
+          /* Bleed 1: navy → white walk into Logic (lands at 14%) */
+          '5%':     { backgroundColor: stops[7] }, /* navy hold end / walk start */
+          '6.3%':   { backgroundColor: stops[6] },
+          '7.6%':   { backgroundColor: stops[5] },
+          '8.9%':   { backgroundColor: stops[4] },
+          '10.2%':  { backgroundColor: stops[3] },
+          '11.5%':  { backgroundColor: stops[2] },
+          '12.8%':  { backgroundColor: stops[1] },
+          '14%':    { backgroundColor: stops[0] }, /* LANDS AT logic 14.3% */
+
+          /* Logic + About: held white */
+          '28%':    { backgroundColor: stops[0] },
+
+          /* Bleed 2: white → navy walk into Proof (lands at 37%) */
+          '29.3%':  { backgroundColor: stops[1] },
+          '30.6%':  { backgroundColor: stops[2] },
+          '31.9%':  { backgroundColor: stops[3] },
+          '33.2%':  { backgroundColor: stops[4] },
+          '34.5%':  { backgroundColor: stops[5] },
+          '35.8%':  { backgroundColor: stops[6] },
+          '37%':    { backgroundColor: stops[7] }, /* LANDS AT proof 37.2% */
+
+          /* Proof + Reach + Expertise: held navy */
+          '58%':    { backgroundColor: stops[7] },
+
+          /* Bleed 3: navy → white walk into Validation (lands at 67%) */
+          '59.3%':  { backgroundColor: stops[6] },
+          '60.6%':  { backgroundColor: stops[5] },
+          '61.9%':  { backgroundColor: stops[4] },
+          '63.2%':  { backgroundColor: stops[3] },
+          '64.5%':  { backgroundColor: stops[2] },
+          '65.8%':  { backgroundColor: stops[1] },
+          '67%':    { backgroundColor: stops[0] }, /* LANDS AT validation 67.3% */
+
+          /* Validation through Footer: held white */
+          '100%':   { backgroundColor: stops[0] }
         }
       });
 
