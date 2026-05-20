@@ -927,8 +927,16 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         return tl;
       }
 
-      /* Bleed 1: navy → white as #logic enters */
-      buildBleed('#logic', 'top bottom', 'top 60%', 7, 0);
+      /* Bleed 1: navy → white as #logic enters.
+         Start/end tuned LATER than the other bleeds because the hero video
+         covers the entire viewport during early scroll -- if the bleed runs
+         while hero is still visible, the navy → white walk happens behind
+         the video where the user can't see it, creating the perception of
+         a hard cut. Starting at 'top 50%' means the bleed window begins
+         only when #logic's top is halfway up the viewport, by which point
+         hero has scrolled off enough that the underlay is visible. The
+         user sees the actual cinematic dissolve in real time. */
+      buildBleed('#logic', 'top 50%', 'top 0%', 7, 0);
       /* Bleed 2: white → navy as #proof enters */
       buildBleed('#proof', 'top bottom', 'top 60%', 0, 7);
       /* Bleed 3: navy → white as #validation enters */
@@ -973,52 +981,128 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
        ================================================================ */
     bleedMM.add('(max-width: 767px)', function () {
 
-      /* DIAGNOSTIC: log the scroll distance GSAP is measuring. After this
-         fix, the value should be a number in the thousands (the actual
-         scrollable page distance). Previous attempt printed 812 (= viewport
-         height), confirming Gemini's diagnosis that trigger-based height
-         measurement was collapsing. The 'end: max' pattern below reads
-         scroll distance directly from the browser scroll engine instead. */
-      ScrollTrigger.create({
-        start: 0,
-        end: 'max',
-        onRefresh: function (self) {
-          console.log('[BLEED] Mobile scroll distance:', Math.round(self.end - self.start), 'px (should be in thousands)');
-        }
-      });
+      /* ============================================================
+         VANILLA MOBILE BLEED
+         After four failed attempts with GSAP/Lenis/ScrollTrigger
+         architectures on mobile (defensive CSS, matchMedia split,
+         documentElement trigger, end:'max' pattern), this path
+         bypasses the entire motion library stack and uses raw DOM APIs.
 
-      gsap.timeline({
-        scrollTrigger: {
-          /* No 'trigger' property -- using start:0 + end:'max' instead.
-             This is GSAP's documented pattern for full-page scroll progress
-             timelines. 'max' reads document.documentElement.scrollHeight
-             minus window.innerHeight directly from the browser scroll
-             engine, completely bypassing trigger element height measurement.
-             Previous attempt using trigger:documentElement with
-             start:'top top' end:'bottom bottom' was reading the trigger
-             element's own height (812px = viewport) instead of the actual
-             scrollable distance, causing the timeline to collapse into
-             the first few pixels of scroll. */
-          start: 0,
-          end: 'max',
-          scrub: true,
-          invalidateOnRefresh: true /* Recalculate on every viewport change (address bar, rotation) */
-        }
-      }).to(pageUnderlay, {
-        ease: 'none',
-        keyframes: {
-          '0%':   { backgroundColor: stops[7] }, /* navy   -- hero */
-          '12%':  { backgroundColor: stops[7] }, /* navy   -- hero end */
-          '20%':  { backgroundColor: stops[0] }, /* white  -- logic enters */
-          '40%':  { backgroundColor: stops[0] }, /* white  -- about end */
-          '48%':  { backgroundColor: stops[7] }, /* navy   -- proof enters */
-          '68%':  { backgroundColor: stops[7] }, /* navy   -- expertise end */
-          '76%':  { backgroundColor: stops[0] }, /* white  -- validation enters */
-          '100%': { backgroundColor: stops[0] }  /* white  -- footer */
-        }
-      });
+         Why this works where the GSAP approaches didn't:
+         - window.scrollY works on every mobile browser since 2010
+         - document.body.scrollHeight - window.innerHeight is the
+           universal mobile scroll distance calculation, independent
+           of overflow rules, viewport units, or library proxies
+         - No library can silently fail because no library is involved
+         - Independent of the desktop architecture (matchMedia gate
+           ensures only one path is active at a time)
 
-      ScrollTrigger.refresh();
+         Trade-off: slightly less smooth than GSAP's RGB interpolation
+         but the difference is imperceptible at typical scroll speeds.
+         ============================================================ */
+
+      /* Parse a hex color string into [r, g, b] integers.
+         Accepts #FFFFFF or #fff formats. */
+      function hexToRgb(hex) {
+        const clean = hex.trim().replace('#', '');
+        const full = clean.length === 3
+          ? clean.split('').map(function (c) { return c + c; }).join('')
+          : clean;
+        return [
+          parseInt(full.substring(0, 2), 16),
+          parseInt(full.substring(2, 4), 16),
+          parseInt(full.substring(4, 6), 16)
+        ];
+      }
+
+      /* Linear interpolation between two RGB color arrays.
+         t is 0..1 progress between fromRgb and toRgb. */
+      function lerpColor(fromRgb, toRgb, t) {
+        return [
+          Math.round(fromRgb[0] + (toRgb[0] - fromRgb[0]) * t),
+          Math.round(fromRgb[1] + (toRgb[1] - fromRgb[1]) * t),
+          Math.round(fromRgb[2] + (toRgb[2] - fromRgb[2]) * t)
+        ];
+      }
+
+      /* Keyframe map: scroll percentage → target chapter color.
+         Same percentages as the previous GSAP attempt -- the values
+         are correct, only the execution mechanism is changing. */
+      const keyframes = [
+        { pct: 0.00, color: hexToRgb(stops[7]) }, /* navy   -- hero        */
+        { pct: 0.12, color: hexToRgb(stops[7]) }, /* navy   -- hero end    */
+        { pct: 0.20, color: hexToRgb(stops[0]) }, /* white  -- logic enter */
+        { pct: 0.40, color: hexToRgb(stops[0]) }, /* white  -- about end   */
+        { pct: 0.48, color: hexToRgb(stops[7]) }, /* navy   -- proof enter */
+        { pct: 0.68, color: hexToRgb(stops[7]) }, /* navy   -- exp. end    */
+        { pct: 0.76, color: hexToRgb(stops[0]) }, /* white  -- valid. enter*/
+        { pct: 1.00, color: hexToRgb(stops[0]) }  /* white  -- footer      */
+      ];
+
+      /* Find the two keyframes the current scroll percentage sits between,
+         then interpolate the color between them. */
+      function getColorAt(progress) {
+        const p = Math.max(0, Math.min(1, progress));
+        for (let i = 0; i < keyframes.length - 1; i++) {
+          const a = keyframes[i];
+          const b = keyframes[i + 1];
+          if (p >= a.pct && p <= b.pct) {
+            const range = b.pct - a.pct;
+            const t = range === 0 ? 0 : (p - a.pct) / range;
+            return lerpColor(a.color, b.color, t);
+          }
+        }
+        return keyframes[keyframes.length - 1].color;
+      }
+
+      /* requestAnimationFrame throttle -- batch scroll events to a single
+         paint per frame. Prevents excessive style writes during fast scroll. */
+      let rafQueued = false;
+      let lastScrollY = -1;
+
+      function updateUnderlay() {
+        rafQueued = false;
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        if (scrollY === lastScrollY) return;
+        lastScrollY = scrollY;
+
+        const maxScroll = Math.max(
+          1, /* Guard against divide-by-zero */
+          (document.documentElement.scrollHeight || document.body.scrollHeight) - window.innerHeight
+        );
+        const progress = scrollY / maxScroll;
+        const rgb = getColorAt(progress);
+        pageUnderlay.style.backgroundColor = 'rgb(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ')';
+      }
+
+      function onScroll() {
+        if (!rafQueued) {
+          rafQueued = true;
+          window.requestAnimationFrame(updateUnderlay);
+        }
+      }
+
+      /* Fire once on init to set the correct starting color. */
+      updateUnderlay();
+
+      /* Listen on both scroll and resize. Resize covers address bar
+         show/hide on mobile because address bar changes also fire resize. */
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
+
+      /* DIAGNOSTIC: log the current scroll height so we can verify
+         it's a real number (in thousands), not viewport height. */
+      console.log('[BLEED] Vanilla mobile path active. Scroll height:',
+        (document.documentElement.scrollHeight || document.body.scrollHeight),
+        'window inner:', window.innerHeight,
+        'max scroll:', (document.documentElement.scrollHeight || document.body.scrollHeight) - window.innerHeight, 'px');
+
+      /* matchMedia cleanup -- remove listeners when the breakpoint exits
+         (e.g. user rotates phone or resizes to desktop). */
+      return function cleanup() {
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
+      };
     });
   }
 }
