@@ -965,8 +965,14 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
       buildBleed('#logic', 'top 90%', 'top 20%', 7, 0);
       /* Bleed 2: white → navy as #proof enters */
       buildBleed('#proof', 'top bottom', 'top 60%', 0, 7);
-      /* Bleed 3: navy → white as #validation enters */
-      buildBleed('#validation', 'top bottom', 'top 60%', 7, 0);
+      /* Bleed 3: navy → white as #validation enters.
+         end pushed from 'top 60%' to 'top 50%' so white settles closer to
+         when the marquee actually becomes visually present. Previously the
+         transition completed when validation's top was 60% down viewport,
+         which felt slightly too early -- services was still on screen but
+         underlay was already white. 'top 50%' = white settles at viewport
+         mid-point, giving services more time on navy. */
+      buildBleed('#validation', 'top bottom', 'top 50%', 7, 0);
 
       ScrollTrigger.refresh();
     });

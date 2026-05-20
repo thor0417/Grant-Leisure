@@ -185,12 +185,58 @@
        does not dominate the column. */
     align-self: center;
     max-width: 85%;
+    /* Bottom margin gives the illustration breathing room from the next
+       section's content -- without it, the tourist photo sits flush against
+       the proof section's icons, making the transition feel crowded. */
+    margin-block-end: clamp(2rem, 6vw, 4rem);
   }
 
   .about-figure img {
     width: 100%;
     height: auto;
     object-fit: contain;
+  }
+
+
+  /* ======================================================================
+     SECTION BREATHING ROOM
+     
+     Mobile sections inherit tight base padding from components.css. With
+     the scroll-tied chapter bleed, transitions need visible scroll
+     distance between chapter-boundary sections so the underlay has room
+     to walk through tonal stops before the next section's content
+     arrives in the viewport.
+
+     Strategy mirrors desktop's asymmetric padding pattern but at mobile-
+     appropriate clamp sizes:
+       - #logic gets extra block-start (hero → logic transition)
+       - #about gets extra block-end (about → proof transition)
+       - #expertise gets extra block-end (expertise → validation transition)
+     Other sections keep their existing padding -- only chapter-boundary
+     transitions need the extra space.
+     ====================================================================== */
+
+  #logic {
+    /* Generous top padding: gives Bleed 1 (navy → white) room to walk
+       through 8 stops AFTER hero scrolls off but BEFORE the 90% number
+       enters frame. Without this, navy was still visible behind logic. */
+    padding-block-start: clamp(5rem, 14vw, 8rem);
+    padding-block-end: clamp(4rem, 10vw, 6rem);
+  }
+
+  #about {
+    /* Generous bottom padding: gives Bleed 2 (white → navy) room to walk
+       AFTER the tourist illustration and BEFORE proof's icons arrive.
+       Without this, white was still visible behind proof. */
+    padding-block-end: clamp(5rem, 14vw, 8rem);
+  }
+
+  #expertise {
+    /* OVERRIDE the tight padding-block: var(--space-xl) above. Generous
+       bottom padding gives Bleed 3 (navy → white) room to walk AFTER the
+       last service card and BEFORE the marquee. */
+    padding-block-start: var(--space-xl);
+    padding-block-end: clamp(5rem, 14vw, 8rem);
   }
 
 
@@ -242,10 +288,8 @@
      be added when that markup ships.
      ====================================================================== */
 
-  /* Tighten section padding and heading margin to match desktop visual ratio */
-  #expertise {
-    padding-block: var(--space-xl);
-  }
+  /* #expertise padding is defined above in SECTION BREATHING ROOM block --
+     do not redeclare here, would overwrite the chapter-transition padding. */
 
   .expertise__heading {
     margin-block-end: var(--space-md);
