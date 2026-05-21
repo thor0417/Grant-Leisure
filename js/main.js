@@ -990,12 +990,13 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
       
       /* Bleed 2: white → navy as #about scrolls away (settles before #proof enters).
          start 'center top' = bleed begins when about's CENTER reaches viewport
-         TOP (about is mostly scrolled past, only bottom portion visible).
-         Before this start, the underlay sits on full white -- about's content
-         displays on pure white during its centered viewport time.
-         end 'bottom 60%' = navy fully settled while about's bottom is still
-         60% down viewport, generous pure-navy buffer before proof arrives. */
-      buildBleed('#about', 'center top', 'bottom 60%', 0, 7);
+         TOP (about is mostly scrolled past). Before this start, the underlay
+         sits on full white -- about's content displays on pure white during
+         its centered viewport time.
+         end 'bottom top' = bleed completes when about's bottom exits viewport.
+         Gives wide scroll window for smooth 8-stop walk. Proof lands on
+         settled navy since about is fully gone by then. */
+      buildBleed('#about', 'center top', 'bottom top', 0, 7);
       
       /* Bleed 3: navy → white as #expertise scrolls away (settles before #validation enters).
          Reverted to last-known-working values. Services stays on full navy
