@@ -223,6 +223,14 @@
   #logic {
     padding-block-start: clamp(5rem, 14vw, 8rem);
     padding-block-end: clamp(4rem, 10vw, 6rem);
+    /* Incremental viewport ownership: gives #logic its own screen moment
+       so the 90% statement doesn't share viewport with About's heading.
+       Applied to #logic only (not all sections) since the full restructure
+       broke mobile scrolling. If this proves stable, other sections can
+       be added incrementally in a future session.
+       No flex centering -- content flows from top with existing padding,
+       avoiding the compound layout issues that broke scrolling. */
+    min-height: 100svh;
   }
 
   #about {
