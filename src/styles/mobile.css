@@ -243,11 +243,10 @@
 
   #expertise {
     padding-block-start: var(--space-xl);
-    /* Increased from clamp(5rem, 14vw, 8rem) -- same logic as #about
-       above. Services cards need to finish on full navy before the
-       bleed walk to white begins. Extra padding gives the bleed room
-       to complete in transition space, not during services content view. */
-    padding-block-end: clamp(8rem, 20vw, 14rem);
+    /* Reduced from clamp(8rem, 20vw, 14rem) overshoot. Services-to-marquee
+       distance was too much. clamp(6rem, 16vw, 10rem) keeps slightly more
+       space than original 5/14/8 but doesn't push marquee too far down. */
+    padding-block-end: clamp(6rem, 16vw, 10rem);
   }
 
 

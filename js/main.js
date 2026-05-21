@@ -985,21 +985,22 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
          which chains 7 sub-tweens between adjacent stops with ease:none. */
       
       /* Bleed 1: navy → white as #hero scrolls away (settles before #logic enters).
-         start 'top center' / end 'bottom 60%' gives the bleed a wider scroll
-         window to walk through all 8 stops smoothly. Settlement happens early
-         with generous pure-white buffer before logic arrives. */
-      buildBleed('#hero', 'top center', 'bottom 60%', 7, 0);
+         Reverted to last-known-working values. */
+      buildBleed('#hero', 'bottom 80%', 'bottom top', 7, 0);
       
       /* Bleed 2: white → navy as #about scrolls away (settles before #proof enters).
-         P's screenshot showed proof centered in viewport with underlay still
-         mid-walk grey. Previous end of 'bottom 30%' was still too late AND the
-         tight start/end window ('bottom 80%' to 'bottom 30%' = only 20vh) was
-         too compressed for an 8-stop walk. Now: wider walk window, earlier
-         settlement, generous pure-navy buffer before proof. */
-      buildBleed('#about', 'top center', 'bottom 60%', 0, 7);
+         start 'center top' = bleed begins when about's CENTER reaches viewport
+         TOP (about is mostly scrolled past, only bottom portion visible).
+         Before this start, the underlay sits on full white -- about's content
+         displays on pure white during its centered viewport time.
+         end 'bottom 60%' = navy fully settled while about's bottom is still
+         60% down viewport, generous pure-navy buffer before proof arrives. */
+      buildBleed('#about', 'center top', 'bottom 60%', 0, 7);
       
-      /* Bleed 3: navy → white as #expertise scrolls away (settles before #validation enters) */
-      buildBleed('#expertise', 'top center', 'bottom 60%', 7, 0);
+      /* Bleed 3: navy → white as #expertise scrolls away (settles before #validation enters).
+         Reverted to last-known-working values. Services stays on full navy
+         until expertise is actually exiting viewport. */
+      buildBleed('#expertise', 'bottom 80%', 'bottom top', 7, 0);
 
       ScrollTrigger.refresh();
     });
