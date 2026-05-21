@@ -199,45 +199,57 @@
 
 
   /* ======================================================================
-     SECTION BREATHING ROOM
+     MOBILE VIEWPORT OWNERSHIP -- A&I-style section architecture
      
-     Mobile sections inherit tight base padding from components.css. With
-     the scroll-tied chapter bleed, transitions need visible scroll
-     distance between chapter-boundary sections so the underlay has room
-     to walk through tonal stops before the next section's content
-     arrives in the viewport.
-
-     Strategy mirrors desktop's asymmetric padding pattern but at mobile-
-     appropriate clamp sizes:
-       - #logic gets extra block-start (hero → logic transition)
-       - #about gets extra block-end (about → proof transition)
-       - #expertise gets extra block-end (expertise → validation transition)
-     Other sections keep their existing padding -- only chapter-boundary
-     transitions need the extra space.
+     Each chapter-anchoring section claims its own full viewport moment.
+     Content is vertically centered within the section so it lands in the
+     middle of the screen as the user scrolls into it. The scroll feels
+     like a sequence of discrete scenes rather than a continuous crowded
+     flow.
+     
+     Pairs with the Option A bleed timing in main.js -- bleed completes
+     within the PREVIOUS chapter section, so when each new viewport-owned
+     section arrives, the underlay is already settled to its color.
+     
+     Tier 1 (100svh): Chapter anchors that command full attention.
+     Tier 2 (70svh):  Dwell sections -- brief content but worth pausing.
+     Tier 3 (natural): Transitional flow between anchors. No min-height.
+     
+     Why svh (small viewport height) not vh: on iOS WebKit, vh includes
+     the area beneath the dynamic browser chrome. svh accounts for it,
+     so 100svh = actual visible viewport. Avoids the bottom-cropped feel.
      ====================================================================== */
-
-  #logic {
-    /* Generous top padding: gives Bleed 1 (navy → white) room to walk
-       through 8 stops AFTER hero scrolls off but BEFORE the 90% number
-       enters frame. Without this, navy was still visible behind logic. */
-    padding-block-start: clamp(5rem, 14vw, 8rem);
-    padding-block-end: clamp(4rem, 10vw, 6rem);
+  
+  #logic,
+  #about,
+  #proof,
+  #reach,
+  #expertise,
+  #leadership,
+  #engage {
+    min-height: 100svh;
+    /* Flex centering -- content sits in the vertical middle of the
+       section's viewport moment. The section's internal padding still
+       applies; this just centers it within the larger frame. */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
-
-  #about {
-    /* Generous bottom padding: gives Bleed 2 (white → navy) room to walk
-       AFTER the tourist illustration and BEFORE proof's icons arrive.
-       Without this, white was still visible behind proof. */
-    padding-block-end: clamp(5rem, 14vw, 8rem);
+  
+  #testimonials {
+    /* Dwell tier: short content (one quote at a time via carousel) but
+       worth a deliberate pause. 70svh gives the quote breathing room
+       without forcing a full empty viewport. */
+    min-height: 70svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
-
-  #expertise {
-    /* OVERRIDE the tight padding-block: var(--space-xl) above. Generous
-       bottom padding gives Bleed 3 (navy → white) room to walk AFTER the
-       last service card and BEFORE the marquee. */
-    padding-block-start: var(--space-xl);
-    padding-block-end: clamp(5rem, 14vw, 8rem);
-  }
+  
+  /* #validation stays transitional -- no min-height. Marquee flows at
+     its natural content height between expertise (full viewport) and
+     leadership (full viewport). The trust line + scrolling logos are
+     social proof in motion, not a moment of dwell. */
 
 
   /* ======================================================================
@@ -288,8 +300,9 @@
      be added when that markup ships.
      ====================================================================== */
 
-  /* #expertise padding is defined above in SECTION BREATHING ROOM block --
-     do not redeclare here, would overwrite the chapter-transition padding. */
+  /* #expertise base sizing is defined above in MOBILE VIEWPORT OWNERSHIP
+     block (min-height: 100svh + flex centering). Do not redeclare those
+     properties here -- bento carousel sits inside the centered section. */
 
   .expertise__heading {
     margin-block-end: var(--space-md);

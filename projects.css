@@ -415,18 +415,16 @@
 
 /* --- Footer --------------------------------------------------- */
 
-.projects-footer {
-  background: var(--gl-navy);
-  padding: var(--space-xl) clamp(1.25rem, 4vw, 3rem);
-  text-align: center;
-}
-
-.projects-footer p {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
+/* Projects.html scope: index.html's footer reads as white because the
+   page-underlay bleed system lands on white at the bottom of the page.
+   Projects.html has NO underlay system -- the grid is flat white. So
+   #footer (transparent in components.css) reveals body's transparent
+   → html's navy, making the footer read as navy. Override here to
+   match index.html visual: white background, padding stays from
+   components.css base rule. Text color (navy at 50%) already correct
+   for white surface. */
+#footer {
+  background-color: var(--gl-white);
 }
 
 /* --- GSAP reveal initial states ------------------------------- */

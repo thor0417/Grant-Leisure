@@ -953,26 +953,45 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         return tl;
       }
 
-      /* Bleed 1: navy → white as #logic enters.
-         Timing: start 'top 90%', end 'top 20%'.
-         Hero is 100vh, so it has scrolled off when logic's top reaches the
-         viewport bottom. start 'top 90%' means the bleed begins when logic's
-         top is 10vh from the top of the viewport (hero is mostly gone, the
-         underlay's actual color is visible). End 'top 20%' completes the
-         bleed when logic's top is 20% down the viewport, well before the
-         content centers. 70vh of scroll distance for the bleed to walk
-         visibly through all 8 stops. */
-      buildBleed('#logic', 'top 90%', 'top 20%', 7, 0);
-      /* Bleed 2: white → navy as #proof enters */
-      buildBleed('#proof', 'top bottom', 'top 60%', 0, 7);
-      /* Bleed 3: navy → white as #validation enters.
-         end pushed from 'top 60%' to 'top 50%' so white settles closer to
-         when the marquee actually becomes visually present. Previously the
-         transition completed when validation's top was 60% down viewport,
-         which felt slightly too early -- services was still on screen but
-         underlay was already white. 'top 50%' = white settles at viewport
-         mid-point, giving services more time on navy. */
-      buildBleed('#validation', 'top bottom', 'top 50%', 7, 0);
+      /* DESKTOP BLEED TIMING -- Option A architecture.
+         
+         Bleeds are tied to the PREVIOUS chapter section's exit, not the
+         NEXT section's entry. This means the underlay settles to its new
+         chapter color BEFORE the next section enters view, then the next
+         section arrives on an already-settled background.
+         
+         Why this approach:
+         1) Cinematic feel -- A&I-style "scene is prepared, then arrives"
+            rather than "scene arrives while transitioning"
+         2) Viewport-height responsive -- bleed window scales with the
+            triggering section's actual scroll distance (which is tied to
+            section content height), not to a viewport percentage. On a
+            small laptop the bleed window stays proportional; on a tall
+            monitor it stays proportional. Previously 'top 50%' collapsed
+            on short screens, causing white to arrive before services
+            had scrolled off.
+         3) Pairs cleanly with the mobile section-ownership restructure --
+            each chapter section has min-height: 100svh, guaranteeing
+            adequate scroll distance for the bleed walk.
+            
+         Trigger pattern: start 'bottom 80%' = bleed begins when the
+         previous section's bottom is 80% down viewport (mostly visible,
+         next section just starting to enter). end 'bottom top' = bleed
+         completes when the previous section's bottom exits viewport
+         entirely. This means by the time the next section's content
+         enters view, the underlay is already settled.
+         
+         Each transition walks through all 8 tonal stops via buildBleed,
+         which chains 7 sub-tweens between adjacent stops with ease:none. */
+      
+      /* Bleed 1: navy → white as #hero scrolls away (settles before #logic enters) */
+      buildBleed('#hero', 'bottom 80%', 'bottom top', 7, 0);
+      
+      /* Bleed 2: white → navy as #about scrolls away (settles before #proof enters) */
+      buildBleed('#about', 'bottom 80%', 'bottom top', 0, 7);
+      
+      /* Bleed 3: navy → white as #expertise scrolls away (settles before #validation enters) */
+      buildBleed('#expertise', 'bottom 80%', 'bottom top', 7, 0);
 
       ScrollTrigger.refresh();
     });
@@ -1042,7 +1061,9 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
       }
 
       /* Install scrollerProxy. ScrollTrigger will now ask Lenis for
-         scroll position instead of reading from native window. */
+         scroll position instead of reading from native window. Required
+         for mobile WebKit where Lenis intercepts touch scroll and
+         window.scrollY may not update reliably. */
       ScrollTrigger.scrollerProxy(document.body, {
         scrollTop: function (value) {
           if (arguments.length) {
@@ -1059,105 +1080,82 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
           };
         }
       });
-
-      /* Build the mobile bleed timeline. scroller:document.body tells
-         ScrollTrigger to use the proxy we just registered. */
-      const mobileBleedTimeline = gsap.timeline({
-        scrollTrigger: {
-          scroller: document.body,
-          trigger: document.documentElement,
-          start: 'top top',
-          end: 'bottom bottom',
-          /* scrub: true (NOT 0.5). Previously had scrub:0.5 for "soft
-             catchup" but it caused visible wrong-color lag on mobile fast
-             scroll -- the bleed was still mid-walk because the 0.5s catchup
-             hadn't completed by the time the user landed on a new section.
-             Pure scrub:true = instant tie to scroll position, no lag. */
-          scrub: true,
-          invalidateOnRefresh: true
+      
+      /* ============================================================
+         MOBILE BLEED -- Section-triggered Option A architecture.
+         
+         Three separate ScrollTrigger timelines, each tied to a previous
+         chapter section's bottom exit. Bleed completes WITHIN the
+         previous section, so the next viewport-owned section (each
+         100svh per mobile.css restructure) arrives on a settled
+         underlay color.
+         
+         Why section triggers, not percentage keyframes:
+         The previous percentage-keyframe approach measured the entire
+         page as a fraction (e.g. "Bleed 1 ends at 11%"). This was
+         fragile -- any change to section heights shifted all the
+         percentages. With section-owned viewports (100svh each), every
+         section is guaranteed at least one screen of scroll distance,
+         so tying the bleed to a SECTION's exit gives consistent timing
+         regardless of content variability or address bar reflows.
+         
+         start 'bottom 80%': bleed begins when previous section's bottom
+         is 80% down viewport -- section still mostly in view but on its
+         way out. end 'bottom top': bleed completes when previous section
+         exits viewport entirely. Next section enters on settled color.
+         ============================================================ */
+      
+      function buildMobileBleed(triggerId, fromIdx, toIdx, startPos) {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            scroller: document.body,
+            trigger: triggerId,
+            start: startPos || 'bottom 80%',
+            end: 'bottom top',
+            scrub: true,
+            invalidateOnRefresh: true
+          }
+        });
+        
+        /* Build sequence of stops to walk through */
+        const sequence = [];
+        if (fromIdx < toIdx) {
+          for (let i = fromIdx; i <= toIdx; i++) sequence.push(stops[i]);
+        } else {
+          for (let i = fromIdx; i >= toIdx; i--) sequence.push(stops[i]);
         }
-      }).to(pageUnderlay, {
-        ease: 'none',
-        keyframes: {
-          /* MOBILE BLEED MAP -- Full 8-stop walks matching desktop buildBleed.
-
-             Section positions (measured): logic 14.3%, proof 37.2%, valid 67.3%.
-
-             End points pulled 3% EARLIER than the actual section positions:
-                Bleed 1 ends at 11% (logic enters at 14.3%)
-                Bleed 2 ends at 34% (proof enters at 37.2%)
-                Bleed 3 ends at 64% (validation enters at 67.3%)
-
-             Why earlier: on real mobile (vs DevTools emulator), three things
-             slow perceived bleed completion:
-             (1) Address bar show/hide reflows the page, triggering
-                 invalidateOnRefresh which briefly desyncs keyframe positions.
-             (2) Touch scroll velocity is faster than mouse wheel -- user
-                 burns through scroll percentages before scrub catches up.
-             (3) Lenis smoothing adds a fraction of catchup time on top.
-             Pulling end-points 3% earlier compensates so the chapter color
-             is settled before the user reads section content. */
-
-          /* Hero: held navy */
-          '0%':     { backgroundColor: stops[7] },
-
-          /* Bleed 1: navy → white walk, lands at 11% (3% before logic at 14.3%) */
-          '2%':     { backgroundColor: stops[7] }, /* navy hold end / walk start */
-          '3.3%':   { backgroundColor: stops[6] },
-          '4.6%':   { backgroundColor: stops[5] },
-          '5.9%':   { backgroundColor: stops[4] },
-          '7.2%':   { backgroundColor: stops[3] },
-          '8.5%':   { backgroundColor: stops[2] },
-          '9.8%':   { backgroundColor: stops[1] },
-          '11%':    { backgroundColor: stops[0] }, /* LANDS before logic 14.3% */
-
-          /* Logic + About: held white */
-          '25%':    { backgroundColor: stops[0] },
-
-          /* Bleed 2: white → navy walk, lands at 34% (3% before proof at 37.2%) */
-          '26.3%':  { backgroundColor: stops[1] },
-          '27.6%':  { backgroundColor: stops[2] },
-          '28.9%':  { backgroundColor: stops[3] },
-          '30.2%':  { backgroundColor: stops[4] },
-          '31.5%':  { backgroundColor: stops[5] },
-          '32.8%':  { backgroundColor: stops[6] },
-          '34%':    { backgroundColor: stops[7] }, /* LANDS before proof 37.2% */
-
-          /* Proof + Reach + Expertise: held navy */
-          '55%':    { backgroundColor: stops[7] },
-
-          /* Bleed 3: navy → white walk, lands at 64% (3% before validation 67.3%) */
-          '56.3%':  { backgroundColor: stops[6] },
-          '57.6%':  { backgroundColor: stops[5] },
-          '58.9%':  { backgroundColor: stops[4] },
-          '60.2%':  { backgroundColor: stops[3] },
-          '61.5%':  { backgroundColor: stops[2] },
-          '62.8%':  { backgroundColor: stops[1] },
-          '64%':    { backgroundColor: stops[0] }, /* LANDS before validation 67.3% */
-
-          /* Validation through Footer: held white */
-          '100%':   { backgroundColor: stops[0] }
-        }
-      });
-
-      /* Diagnostic: log scroll distance from Lenis's perspective.
-         Should now report actual page height in thousands. */
-      ScrollTrigger.create({
-        scroller: document.body,
-        start: 0,
-        end: 'max',
-        onRefresh: function (self) {
-          console.log('[BLEED] Mobile (Lenis proxy) scroll distance:',
-            Math.round(self.end - self.start), 'px');
-        }
-      });
+        
+        /* Chain sub-tweens between adjacent stops -- matches desktop buildBleed */
+        sequence.forEach(function (color, i) {
+          if (i === 0) return;
+          tl.to(pageUnderlay, { backgroundColor: color, ease: 'none' });
+        });
+        
+        return tl;
+      }
+      
+      /* Bleed 1: navy → white as #hero scrolls away (settles before #logic).
+         start 'bottom bottom' (NOT 'bottom 80%') -- bleed begins as soon as
+         user starts scrolling past hero. P reported navy holding too long
+         on the hero → logic transition; the earlier start gives the bleed
+         the full hero exit distance to walk through 8 stops. */
+      const mobileBleed1 = buildMobileBleed('#hero', 7, 0, 'bottom bottom');
+      
+      /* Bleed 2: white → navy as #about scrolls away (settles before #proof) */
+      const mobileBleed2 = buildMobileBleed('#about', 0, 7);
+      
+      /* Bleed 3: navy → white as #expertise scrolls away (settles before #validation) */
+      const mobileBleed3 = buildMobileBleed('#expertise', 7, 0);
 
       ScrollTrigger.refresh();
 
-      /* Cleanup on breakpoint exit: kill the timeline, remove the proxy,
-         restore default scroller behavior so desktop wiring is unaffected. */
+      /* Cleanup on breakpoint exit: kill all three timelines, remove the
+         proxy, restore default scroller behavior so desktop wiring is
+         unaffected when the user resizes back up. */
       return function cleanup() {
-        mobileBleedTimeline.kill();
+        mobileBleed1.kill();
+        mobileBleed2.kill();
+        mobileBleed3.kill();
         ScrollTrigger.scrollerProxy(document.body, null);
         ScrollTrigger.refresh();
       };
