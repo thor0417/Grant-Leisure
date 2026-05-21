@@ -1151,24 +1151,25 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
           '33.8%':  { backgroundColor: stops[6] },
           '34%':    { backgroundColor: stops[7] },
 
-          /* Proof + Reach + Expertise: held navy -- extended to 59% (was 55%)
-             so services stays on full navy longer before the walk to white
-             begins. Combined with #expertise's increased bottom padding in
-             mobile.css, services content sits on pure navy throughout its
-             viewport time. */
-          '59%':    { backgroundColor: stops[7] },
+          /* Proof + Reach + Expertise: held navy -- extended to 62% (was 59%)
+             to compensate for reduced #expertise bottom padding. When
+             expertise padding was reduced from 14rem to 10rem, validation's
+             scroll position moved earlier, requiring the navy hold to extend
+             so services stays on full navy throughout its viewport time. */
+          '62%':    { backgroundColor: stops[7] },
 
-          /* Bleed 3: navy → white walk, lands at 64%.
-             Walk window tightened from 8% to 5% -- same logic as Bleed 2.
-             Bleed happens in transition space after services scrolls off,
-             not during services content view. */
-          '59.8%':  { backgroundColor: stops[6] },
-          '60.6%':  { backgroundColor: stops[5] },
-          '61.4%':  { backgroundColor: stops[4] },
-          '62.2%':  { backgroundColor: stops[3] },
-          '63.0%':  { backgroundColor: stops[2] },
-          '63.8%':  { backgroundColor: stops[1] },
-          '64%':    { backgroundColor: stops[0] },
+          /* Bleed 3: navy → white walk, lands at 67%.
+             Walk window 5% (62% → 67%). Shifted from 59.8%→64% to compensate
+             for reduced expertise padding -- with less padding, validation
+             arrives earlier in scroll, so the walk happens later relative
+             to the new section positions. Services cards stay on navy. */
+          '62.8%':  { backgroundColor: stops[6] },
+          '63.6%':  { backgroundColor: stops[5] },
+          '64.4%':  { backgroundColor: stops[4] },
+          '65.2%':  { backgroundColor: stops[3] },
+          '66.0%':  { backgroundColor: stops[2] },
+          '66.8%':  { backgroundColor: stops[1] },
+          '67%':    { backgroundColor: stops[0] },
 
           /* Validation through Footer: held white */
           '100%':   { backgroundColor: stops[0] }
