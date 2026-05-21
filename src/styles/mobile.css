@@ -234,12 +234,20 @@
   }
 
   #about {
-    padding-block-end: clamp(5rem, 14vw, 8rem);
+    /* Increased from clamp(5rem, 14vw, 8rem) -- gives more scroll distance
+       AFTER tourist illustration before proof begins. The bleed walk
+       (white → navy) needs room to happen in this padding zone instead
+       of overlapping the tourist content view. */
+    padding-block-end: clamp(8rem, 20vw, 14rem);
   }
 
   #expertise {
     padding-block-start: var(--space-xl);
-    padding-block-end: clamp(5rem, 14vw, 8rem);
+    /* Increased from clamp(5rem, 14vw, 8rem) -- same logic as #about
+       above. Services cards need to finish on full navy before the
+       bleed walk to white begins. Extra padding gives the bleed room
+       to complete in transition space, not during services content view. */
+    padding-block-end: clamp(8rem, 20vw, 14rem);
   }
 
 
