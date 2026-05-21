@@ -1081,81 +1081,83 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         }
       });
       
-      /* ============================================================
-         MOBILE BLEED -- Section-triggered Option A architecture.
-         
-         Three separate ScrollTrigger timelines, each tied to a previous
-         chapter section's bottom exit. Bleed completes WITHIN the
-         previous section, so the next viewport-owned section (each
-         100svh per mobile.css restructure) arrives on a settled
-         underlay color.
-         
-         Why section triggers, not percentage keyframes:
-         The previous percentage-keyframe approach measured the entire
-         page as a fraction (e.g. "Bleed 1 ends at 11%"). This was
-         fragile -- any change to section heights shifted all the
-         percentages. With section-owned viewports (100svh each), every
-         section is guaranteed at least one screen of scroll distance,
-         so tying the bleed to a SECTION's exit gives consistent timing
-         regardless of content variability or address bar reflows.
-         
-         start 'bottom 80%': bleed begins when previous section's bottom
-         is 80% down viewport -- section still mostly in view but on its
-         way out. end 'bottom top': bleed completes when previous section
-         exits viewport entirely. Next section enters on settled color.
-         ============================================================ */
-      
-      function buildMobileBleed(triggerId, fromIdx, toIdx, startPos) {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            scroller: document.body,
-            trigger: triggerId,
-            start: startPos || 'bottom 80%',
-            end: 'bottom top',
-            scrub: true,
-            invalidateOnRefresh: true
-          }
-        });
-        
-        /* Build sequence of stops to walk through */
-        const sequence = [];
-        if (fromIdx < toIdx) {
-          for (let i = fromIdx; i <= toIdx; i++) sequence.push(stops[i]);
-        } else {
-          for (let i = fromIdx; i >= toIdx; i--) sequence.push(stops[i]);
+      /* Build the mobile bleed timeline. scroller:document.body tells
+         ScrollTrigger to use the proxy we just registered. */
+      const mobileBleedTimeline = gsap.timeline({
+        scrollTrigger: {
+          scroller: document.body,
+          trigger: document.documentElement,
+          start: 'top top',
+          end: 'bottom bottom',
+          /* scrub: true (NOT 0.5). scrub:0.5 caused visible wrong-color
+             lag on mobile fast scroll. Pure scrub:true = instant tie to
+             scroll position, no lag. */
+          scrub: true,
+          invalidateOnRefresh: true
         }
-        
-        /* Chain sub-tweens between adjacent stops -- matches desktop buildBleed */
-        sequence.forEach(function (color, i) {
-          if (i === 0) return;
-          tl.to(pageUnderlay, { backgroundColor: color, ease: 'none' });
-        });
-        
-        return tl;
-      }
-      
-      /* Bleed 1: navy → white as #hero scrolls away (settles before #logic).
-         start 'bottom bottom' (NOT 'bottom 80%') -- bleed begins as soon as
-         user starts scrolling past hero. P reported navy holding too long
-         on the hero → logic transition; the earlier start gives the bleed
-         the full hero exit distance to walk through 8 stops. */
-      const mobileBleed1 = buildMobileBleed('#hero', 7, 0, 'bottom bottom');
-      
-      /* Bleed 2: white → navy as #about scrolls away (settles before #proof) */
-      const mobileBleed2 = buildMobileBleed('#about', 0, 7);
-      
-      /* Bleed 3: navy → white as #expertise scrolls away (settles before #validation) */
-      const mobileBleed3 = buildMobileBleed('#expertise', 7, 0);
+      }).to(pageUnderlay, {
+        ease: 'none',
+        keyframes: {
+          /* MOBILE BLEED MAP -- Full 8-stop walks matching desktop buildBleed.
+
+             Section positions (measured): logic 14.3%, proof 37.2%, valid 67.3%.
+
+             End points pulled 3% EARLIER than the actual section positions:
+                Bleed 1 ends at 11% (logic enters at 14.3%)
+                Bleed 2 ends at 34% (proof enters at 37.2%)
+                Bleed 3 ends at 64% (validation enters at 67.3%)
+
+             Compensates for real-mobile scroll lag (address bar reflows,
+             touch velocity > mouse wheel, Lenis smoothing). */
+
+          /* Hero: held navy */
+          '0%':     { backgroundColor: stops[7] },
+
+          /* Bleed 1: navy → white walk, lands at 11% (3% before logic at 14.3%) */
+          '2%':     { backgroundColor: stops[7] },
+          '3.3%':   { backgroundColor: stops[6] },
+          '4.6%':   { backgroundColor: stops[5] },
+          '5.9%':   { backgroundColor: stops[4] },
+          '7.2%':   { backgroundColor: stops[3] },
+          '8.5%':   { backgroundColor: stops[2] },
+          '9.8%':   { backgroundColor: stops[1] },
+          '11%':    { backgroundColor: stops[0] },
+
+          /* Logic + About: held white */
+          '25%':    { backgroundColor: stops[0] },
+
+          /* Bleed 2: white → navy walk, lands at 34% (3% before proof at 37.2%) */
+          '26.3%':  { backgroundColor: stops[1] },
+          '27.6%':  { backgroundColor: stops[2] },
+          '28.9%':  { backgroundColor: stops[3] },
+          '30.2%':  { backgroundColor: stops[4] },
+          '31.5%':  { backgroundColor: stops[5] },
+          '32.8%':  { backgroundColor: stops[6] },
+          '34%':    { backgroundColor: stops[7] },
+
+          /* Proof + Reach + Expertise: held navy */
+          '55%':    { backgroundColor: stops[7] },
+
+          /* Bleed 3: navy → white walk, lands at 64% (3% before validation 67.3%) */
+          '56.3%':  { backgroundColor: stops[6] },
+          '57.6%':  { backgroundColor: stops[5] },
+          '58.9%':  { backgroundColor: stops[4] },
+          '60.2%':  { backgroundColor: stops[3] },
+          '61.5%':  { backgroundColor: stops[2] },
+          '62.8%':  { backgroundColor: stops[1] },
+          '64%':    { backgroundColor: stops[0] },
+
+          /* Validation through Footer: held white */
+          '100%':   { backgroundColor: stops[0] }
+        }
+      });
 
       ScrollTrigger.refresh();
 
-      /* Cleanup on breakpoint exit: kill all three timelines, remove the
-         proxy, restore default scroller behavior so desktop wiring is
-         unaffected when the user resizes back up. */
+      /* Cleanup on breakpoint exit: kill the timeline, remove the proxy,
+         restore default scroller behavior so desktop wiring is unaffected. */
       return function cleanup() {
-        mobileBleed1.kill();
-        mobileBleed2.kill();
-        mobileBleed3.kill();
+        mobileBleedTimeline.kill();
         ScrollTrigger.scrollerProxy(document.body, null);
         ScrollTrigger.refresh();
       };
