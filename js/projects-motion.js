@@ -60,7 +60,11 @@
       lenis.raf(time * 1000);
     });
 
-    ScrollTrigger.refresh();
+    /* Removed: ScrollTrigger.refresh() call previously here.
+       Premature refresh -- fires before any ScrollTriggers exist (they're
+       created inside initRevealAnimations later). Just added work during
+       initial paint, contributing to mobile scroll glitch at page top.
+       The refresh inside initRevealAnimations does the real work. */
 
   } else {
     console.warn('projects-motion.js: Lenis not found. Falling back to native scroll.');
@@ -229,9 +233,16 @@
 
   };
 
-  /* Run on initial page load */
+  /* Run on initial page load.
+     Deferred by 100ms so Lenis fully calibrates and images begin loading
+     before reveal ScrollTriggers fire. Without this delay, multiple
+     reveals fire immediately on init -- colliding with Lenis scroll
+     calibration and image loading. Compound source of the mobile
+     scroll-glitch-at-top-of-page bug. */
   if (!prefersReducedMotion) {
-    window.initRevealAnimations();
+    setTimeout(function () {
+      window.initRevealAnimations();
+    }, 100);
   }
 
 }());
