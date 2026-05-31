@@ -251,7 +251,6 @@
   line-height: 1.05;
   letter-spacing: 0.01em;
   color: var(--gl-white);
-  text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
   /* Directional shadow -- depth without glow, anchors text against any video frame */
   text-shadow:
