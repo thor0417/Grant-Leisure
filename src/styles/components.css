@@ -1682,7 +1682,7 @@
 }
 
 .memorial__name {
-  font-family: var(--font-serif);
+  font-family: var(--font-header);
   font-size: clamp(2.2rem, 4vw, 3.5rem);
   color: var(--gl-navy);
   margin: 0 0 0.4rem;
