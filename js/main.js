@@ -1001,7 +1001,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
       /* Bleed 3: navy → white as #expertise scrolls away (settles before #validation enters).
          Reverted to last-known-working values. Services stays on full navy
          until expertise is actually exiting viewport. */
-      buildBleed('#expertise', 'bottom 80%', 'bottom 50%', 7, 0);
+      buildBleed('#expertise', 'bottom 80%', 'bottom 20%', 7, 0);
 
       ScrollTrigger.refresh();
     });
