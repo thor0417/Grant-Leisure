@@ -140,11 +140,6 @@ if (teamTrack && teamPrev && teamNext) {
 /* -- Bio modal -------------------------------------------- */
 
 const bioData = {
-  'bio-01': {
-    name: 'Robert Liljenwall',
-    title: 'Chairman Emeritus',
-    body: '<p>Robert has been a long-time principal of Grant Leisure, serving as head of its marketing and branding services and providing initial concept and creative direction for a broad spectrum of leisure attractions, visitor services, and integrated marketing communications programs.</p><p>His career as a themed entertainment industry executive began with Disney and he has since worked on leisure and entertainment projects spanning a variety of themed attractions, zoological parks, resorts, film studios, themed entertainment centers, and new urban developments.</p><p>Robert is an expert with developing a project\'s customer marketing matrix, identifying how best to serve visitors, maximize revenue streams, and ensure the highest degree of customer satisfaction.</p>'
-  },
   'bio-02': {
     name: 'Keith Robertson',
     title: 'Managing Director',
@@ -186,9 +181,9 @@ const bioData = {
     body: '<p>Edmund has enjoyed over 25 years as a business development and management consultant, specializing in improving access to cultural visitor destinations. He has led over 150 projects for Grant Leisure, with clients ranging from leisure enterprises and financial institutions to non-profit and government agencies such as Tate Modern, Victoria and Albert Museum, Windsor Castle, the London Eye, Legoland, and Babelsberg Studios.</p><p>Several of Edmund\'s projects including Our Dynamic Earth, The Royal Armouries, and Tower of London have involved multi-year assignments engaging all stages of planning, development, and operations.</p>'
   },
   'bio-10': {
-    name: 'Scott Lang',
+    name: 'Scott Lange',
     title: 'Director of Marketing',
-    body: '<p>Scott is a lifelong marketer, television producer, and business growth expert with over 40 years of experience commercializing intellectual property and securing corporate sponsorship across sports, entertainment, arts, and philanthropic properties.</p><p>His career highlights include co-founding National College Television, driving the commercial growth of the New York City Marathon, securing sponsorship for SFX Sports Television, monetizing The Gates Project by Christo and Jean-Claude, and providing production finance for the Singleton Foundation\'s award-winning Million Stories Media channel.</p>'
+    body: '<p>Scott is a lifelong marketer, television producer, and business growth expert with over 40 years of experience commercializing intellectual property and securing corporate sponsorship across sports, entertainment, arts, and philanthropic properties.</p><p>His career highlights include co-founding National College Television, driving the commercial growth of the New York City Marathon, securing sponsorship for SFX Sports Television, monetizing The Gates Project by Christo and Jean-Claude, and secured sponsorship for the Singleton Foundation\'s award-winning Million Stories Media channel.</p>'
   }
 };
 
@@ -1006,7 +1001,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
       /* Bleed 3: navy → white as #expertise scrolls away (settles before #validation enters).
          Reverted to last-known-working values. Services stays on full navy
          until expertise is actually exiting viewport. */
-      buildBleed('#expertise', 'bottom 80%', 'bottom top', 7, 0);
+      buildBleed('#expertise', 'bottom 80%', 'bottom 50%', 7, 0);
 
       ScrollTrigger.refresh();
     });

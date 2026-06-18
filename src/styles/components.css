@@ -1637,3 +1637,99 @@
   transform: translateY(40px);
   will-change: opacity, transform;
 }
+
+/* ============================================================
+   MEMORIAL -- Robert Liljenwall
+   White chapter. Remove this block when the section is retired.
+   ============================================================ */
+
+#memorial {
+  padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 6vw, 6rem);
+}
+
+.memorial__inner {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(3rem, 6vw, 6rem);
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.memorial__figure {
+  margin: 0;
+}
+
+.memorial__figure img {
+  width: 100%;
+  height: auto;
+  /* Matches team-card--robert object-position for consistent framing */
+  object-fit: cover;
+  object-position: center 15%;
+  aspect-ratio: 1 / 1;
+  display: block;
+  /* Desaturated treatment -- this is a memorial, not a team card */
+  filter: grayscale(30%);
+}
+
+.memorial__eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gl-green);
+  margin: 0 0 0.75rem;
+}
+
+.memorial__name {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  color: var(--gl-navy);
+  margin: 0 0 0.4rem;
+  line-height: 1.1;
+}
+
+.memorial__title {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  letter-spacing: 0.08em;
+  color: rgba(50, 62, 72, 0.55);
+  margin: 0 0 2rem;
+  text-transform: uppercase;
+}
+
+/* Thin rule separating title from body text */
+.memorial__title::after {
+  content: '';
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: var(--gl-green);
+  margin-top: 1.5rem;
+}
+
+.memorial__body p {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.1vw, 1.125rem);
+  line-height: 1.75;
+  color: var(--gl-navy);
+  margin: 0 0 1.2rem;
+}
+
+.memorial__body p:last-child {
+  margin-bottom: 0;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* Mobile: stack photo above text */
+@media (max-width: 767px) {
+  .memorial__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .memorial__figure img {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
