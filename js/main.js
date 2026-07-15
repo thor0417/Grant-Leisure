@@ -143,7 +143,7 @@ const bioData = {
   'bio-02': {
     name: 'Keith Robertson',
     title: 'Managing Director',
-    body: '<p>Keith is a well-rounded senior executive with over 40 years of international project management experience in design, engineering, and operations for the development of major electrical power systems, commercial, industrial and residential construction, theme parks, water parks, tourism, and hospitality.</p><p>His high-energy approach and diversified experience in strategic planning, training, staffing, maintenance, and operations has proven invaluable for his clients as he continues driving innovative engineering and management solutions.</p>'
+    body: '<p>Keith is a senior executive with over 40 years of international project management experience in design, engineering, and operations for the development of major electrical power systems, commercial, industrial and residential construction, theme parks, water parks, tourism, and hospitality.</p><p>His high-energy approach and diversified experience in strategic planning, training, staffing, maintenance, and operations has proven invaluable for his clients as he continues driving innovative engineering and management solutions.</p>'
   },
   'bio-03': {
     name: 'Andy Grant',
@@ -158,7 +158,7 @@ const bioData = {
   'bio-05': {
     name: 'Clive Jones',
     title: 'Director of Strategic Planning',
-    body: '<p>Clive has evaluated investment programs and solicited investors and operators for major hotels, resorts, and casinos throughout Asia-Pacific, the Americas, and Europe. His expertise in market and investment analysis, development programming, and database marketing has earned him a sterling reputation within the attractions, hospitality, and tourism industries.</p><p>Notable clients include the US National Park Service, Hong Kong Tourism Board, Canadian Tourism Board, the state of California, and the city of San Francisco. His ability to create market-driven value for clients is the common denominator across all his successful assignments.</p>'
+    body: '<p>Clive has evaluated investment programs and solicited investors and operators for major hotels, resorts, and casinos throughout Asia-Pacific, the Americas, and Europe. His expertise in market and investment analysis, development programming, and database marketing has earned him a sterling reputation within the attractions, hospitality, and tourism industries.</p><p>Notable clients include the US National Park Service, Hong Kong Tourism Board, Canadian Tourism Board, the state of California, and the city of San Francisco.</p>'
   },
   'bio-06': {
     name: 'Claus Frimand',
@@ -168,7 +168,7 @@ const bioData = {
   'bio-07': {
     name: 'Philip Kwong',
     title: 'Director of Compliance and Business Operations',
-    body: '<p>Philip Kwong is a compliance and operations consultant with eight years of experience in highly regulated and emerging industries. Having held leadership roles in the development of international standards bodies, including Vice Convener of ISO IWA 37 and Chair of UL Canada\'s TG 4400-2, he has contributed to regulatory frameworks, worked with publicly traded companies, and taken complex projects from inception through to completion.</p>'
+    body: '<p>Philip Kwong works at the intersection of compliance, operations, and strategy. Over eight years in highly regulated and emerging industries, he has held leadership roles in international standards development, including Vice Convener of ISO IWA 37 and Chair of UL Canada\'s Technical Guide 4400-2. He has contributed to government regulatory consultations and published on regulation and standards in the European policy press. His work spans market entry, regulatory architecture, quality systems, and commercialization, taking complex projects from inception through to completion for publicly traded companies and organizations entering new markets. He operates between Vancouver and Bangkok.</p>'
   },
   'bio-08': {
     name: 'Andrew Coates',
@@ -183,7 +183,7 @@ const bioData = {
   'bio-10': {
     name: 'Scott Lange',
     title: 'Director of Marketing',
-    body: '<p>Scott is a lifelong marketer, television producer, and business growth expert with over 40 years of experience commercializing intellectual property and securing corporate sponsorship across sports, entertainment, arts, and philanthropic properties.</p><p>His career highlights include co-founding National College Television, driving the commercial growth of the New York City Marathon, securing sponsorship for SFX Sports Television, monetizing The Gates Project by Christo and Jean-Claude, and secured sponsorship for the Singleton Foundation\'s award-winning Million Stories Media channel.</p>'
+    body: '<p>Scott is a lifelong marketer, television producer, and business growth expert with over 40 years of experience commercializing intellectual property and securing corporate sponsorship across sports, entertainment, arts, and philanthropy.</p><p>His career highlights include co-founding National College Television, driving the commercial growth of the New York City Marathon, securing sponsorship for SFX Sports Television, monetizing The Gates Project by Christo and Jean-Claude, and secured sponsorship for the Singleton Foundation\'s award-winning Million Stories Media channel.</p>'
   }
 };
 
