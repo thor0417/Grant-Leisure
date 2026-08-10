@@ -1136,6 +1136,12 @@
   object-position: center 25%;
 }
 
+.team-card--philip .team-card__img-wrap img {
+  /* Pans crop down from default `center top` to reveal more torso.
+     Starting point between Andy (35%) and default; tune in 5% steps. */
+  object-position: center 30%;
+}
+
 .team-card:hover .team-card__img-wrap img {
   transform: scale(1.04);
 }
